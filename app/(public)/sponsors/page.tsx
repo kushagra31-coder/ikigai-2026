@@ -2,6 +2,7 @@ import { Container, Section, Grid } from '@/components/layout';
 import { PUBLIC_CONTENT } from '@/components/constants/public-content';
 import { Fade, Scale, Hover } from '@/components/motion';
 import { GlassCard } from '@/components/data-display/GlassCard';
+import Image from 'next/image';
 
 export const metadata = {
   title: 'Sponsors | IKIGAI 2026',
@@ -27,8 +28,15 @@ export default function SponsorsPage() {
               <Hover>
                 <a href={sponsor.website} target="_blank" rel="noreferrer" className="block h-full">
                   <GlassCard className="h-full flex flex-col items-center justify-center text-center group border-white/5 hover:border-primary/50 p-8">
-                    <div className="w-24 h-24 bg-white/5 rounded-xl mb-6 flex items-center justify-center">
-                      <span className="text-xs text-muted-foreground">Logo</span>
+                    <div className="relative w-full h-24 mb-6">
+                      <Image
+                        src={sponsor.logo}
+                        alt={`${sponsor.name} Logo`}
+                        fill
+                        className="object-contain filter grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        loading="lazy"
+                      />
                     </div>
                     <h3 className="text-heading-m mb-2 group-hover:text-primary transition-colors">{sponsor.name}</h3>
                     <span className="text-xs uppercase tracking-wider text-accent font-semibold">{sponsor.tier}</span>

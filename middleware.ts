@@ -1,10 +1,17 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+// Middleware runs on the Edge runtime — check env at evaluation time
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const IS_MOCKED = !SUPABASE_URL || SUPABASE_URL.trim() === '' || SUPABASE_URL === 'undefined';
+
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  });
+  // If no Supabase config, allow all traffic through (mock/dev mode)
+  if (IS_MOCKED) {
+    return NextResponse.next({ request });
+  }
+
+  let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,9 +23,7 @@ export async function middleware(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          supabaseResponse = NextResponse.next({
-            request,
-          });
+          supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           );
@@ -27,7 +32,7 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Check auth and redirect if trying to access /workspace
+  // Refresh session and protect /workspace routes
   const { data: { user } } = await supabase.auth.getUser();
 
   if (request.nextUrl.pathname.startsWith('/workspace') && !user) {
@@ -39,13 +44,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

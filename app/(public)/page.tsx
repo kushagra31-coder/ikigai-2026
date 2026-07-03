@@ -7,6 +7,7 @@ import { Countdown } from '@/components/landing/hero/Countdown';
 import { PUBLIC_CONTENT } from '@/components/constants/public-content';
 import { Icons, IconType } from '@/components/constants/icons';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   return (
@@ -143,8 +144,19 @@ export default function Home() {
           
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {PUBLIC_CONTENT.sponsors.map((sponsor) => (
-              <GlassCard key={sponsor.id} className="p-4 flex items-center justify-center min-h-[120px] group border-white/5 hover:border-primary/30 transition-colors bg-white/5 hover:bg-white/10">
-                <h3 className="text-sm font-bold text-center tracking-wider uppercase text-muted-foreground group-hover:text-foreground transition-colors">{sponsor.name}</h3>
+              <GlassCard key={sponsor.id} className="p-4 flex flex-col items-center justify-center min-h-[120px] group border-white/5 hover:border-primary/30 transition-colors bg-white/5 hover:bg-white/10 relative overflow-hidden">
+                <div className="relative w-full h-16 mb-2">
+                  <Image
+                    src={sponsor.logo}
+                    alt={`${sponsor.name} Logo`}
+                    fill
+                    className="object-contain filter grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+                    sizes="(max-width: 768px) 50vw, 20vw"
+                    loading="lazy"
+                  />
+                </div>
+                <h3 className="text-xs font-bold text-center tracking-wider uppercase text-muted-foreground group-hover:text-foreground transition-colors line-clamp-1">{sponsor.name}</h3>
+                <span className="absolute top-2 right-2 text-[10px] uppercase text-primary/50">{sponsor.tier}</span>
               </GlassCard>
             ))}
           </div>

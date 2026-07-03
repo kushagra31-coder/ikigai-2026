@@ -3,20 +3,22 @@ import { Footer } from '@/components/landing/Footer';
 import { ReactNode } from 'react';
 import { Metadata } from 'next';
 
+import IKIGAI2026_CONFIG from '@/config/event.config';
+
 export const metadata: Metadata = {
-  title: 'IKIGAI 2026 | Innovate. Build. Transform.',
-  description: 'The ultimate 36-hour hackathon to test your limits, build innovative solutions, and shape the future.',
+  title: `${IKIGAI2026_CONFIG.branding.eventName} | ${IKIGAI2026_CONFIG.branding.slogan}`,
+  description: IKIGAI2026_CONFIG.branding.mission,
   openGraph: {
-    title: 'IKIGAI 2026',
-    description: 'The ultimate 36-hour hackathon.',
-    url: 'https://ikigai.example.com',
-    siteName: 'IKIGAI 2026',
+    title: IKIGAI2026_CONFIG.branding.eventName,
+    description: IKIGAI2026_CONFIG.branding.mission,
+    url: IKIGAI2026_CONFIG.social.website,
+    siteName: IKIGAI2026_CONFIG.branding.eventName,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'IKIGAI 2026',
-    description: 'The ultimate 36-hour hackathon.',
+    title: IKIGAI2026_CONFIG.branding.eventName,
+    description: IKIGAI2026_CONFIG.branding.mission,
   }
 };
 

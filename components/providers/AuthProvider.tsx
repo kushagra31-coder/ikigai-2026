@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AuthState } from '@/types/auth.types';
-import { createClient } from '@/lib/supabase/client';
+import { IS_MOCKED } from '@/lib/supabase/is-mocked';
 import { AuthService } from '@/features/authentication/services/auth.service';
 import { ProfileService } from '@/features/authentication/services/profile.service';
 
@@ -19,18 +19,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     let mounted = true;
-    const supabase = createClient();
 
     const fetchSessionAndProfile = async () => {
       try {
         const session = await AuthService.getSession();
         if (session) {
-          const profile = await ProfileService.getProfile(session.user.id);
+          // In mock mode, ProfileService may not have a real user — use a mock profile
+          const profile = IS_MOCKED
+            ? null
+            : await ProfileService.getProfile(session.user.id);
           if (mounted) {
             setState({
-              user: session.user,
+              user: session.user as AuthState['user'],
               profile,
-              role: profile?.role || null,
+              role: (profile?.role as AuthState['role']) || null,
               loading: false,
               authenticated: true,
             });
@@ -42,24 +44,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } catch {
         if (mounted) {
-            setState({ user: null, profile: null, role: null, loading: false, authenticated: false });
+          setState({ user: null, profile: null, role: null, loading: false, authenticated: false });
         }
       }
     };
 
     fetchSessionAndProfile();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-        fetchSessionAndProfile();
-      } else if (event === 'SIGNED_OUT') {
-        setState({ user: null, profile: null, role: null, loading: false, authenticated: false });
-      }
-    });
+    // Only subscribe to Supabase auth state changes when NOT mocked
+    if (!IS_MOCKED) {
+      import('@/lib/supabase/client').then(({ createClient }) => {
+        const supabase = createClient();
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
+          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+            fetchSessionAndProfile();
+          } else if (event === 'SIGNED_OUT') {
+            setState({ user: null, profile: null, role: null, loading: false, authenticated: false });
+          }
+        });
+        return () => {
+          mounted = false;
+          subscription.unsubscribe();
+        };
+      });
+    }
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
     };
   }, []);
 

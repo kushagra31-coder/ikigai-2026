@@ -50,6 +50,8 @@ export const LoginForm = () => {
             type="email" 
             placeholder="m@example.com" 
             required 
+            pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
+            title="Please enter a valid email address ending with a proper domain (e.g., @gmail.com)"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isLoading}

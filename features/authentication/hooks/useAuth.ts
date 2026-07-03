@@ -5,10 +5,11 @@ export const useAuth = () => {
   const state = useAuthContext();
   return {
     ...state,
-    signInWithGoogle: AuthService.signInWithGoogle,
-    signInWithEmail: AuthService.signInWithEmail,
-    signUpWithEmail: AuthService.signUpWithEmail,
-    signOut: AuthService.signOut,
-    resetPassword: AuthService.resetPassword,
+    // Bind explicitly so `this` is preserved inside AuthService methods
+    signInWithGoogle: () => AuthService.signInWithGoogle(),
+    signInWithEmail: (email: string, password: string) => AuthService.signInWithEmail(email, password),
+    signUpWithEmail: (email: string, password: string, fullName: string) => AuthService.signUpWithEmail(email, password, fullName),
+    signOut: () => AuthService.signOut(),
+    resetPassword: (email: string) => AuthService.resetPassword(email),
   };
 };

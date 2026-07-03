@@ -16,25 +16,24 @@ import { QueryProvider } from "@/components/providers/QueryProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
-import { EVENT_CONFIG } from "@/config/event.config";
-
+import IKIGAI2026_CONFIG from "@/config/event.config";
 export const metadata: Metadata = {
   title: {
-    template: `%s | ${EVENT_CONFIG.name}`,
-    default: EVENT_CONFIG.name,
+    template: `%s | ${IKIGAI2026_CONFIG.branding.eventName}`,
+    default: `${IKIGAI2026_CONFIG.branding.eventName} - ${IKIGAI2026_CONFIG.branding.tagline}`,
   },
-  description: EVENT_CONFIG.description,
+  description: IKIGAI2026_CONFIG.branding.mission,
   openGraph: {
-    title: EVENT_CONFIG.name,
-    description: EVENT_CONFIG.description,
-    url: 'https://ikigai.acropolis.in',
-    siteName: EVENT_CONFIG.name,
+    title: IKIGAI2026_CONFIG.branding.eventName,
+    description: IKIGAI2026_CONFIG.branding.mission,
+    url: IKIGAI2026_CONFIG.social.website,
+    siteName: IKIGAI2026_CONFIG.branding.eventName,
     images: [
       {
-        url: '/og-image.jpg',
+        url: IKIGAI2026_CONFIG.assets.seo.ogImage,
         width: 1200,
         height: 630,
-        alt: EVENT_CONFIG.name,
+        alt: IKIGAI2026_CONFIG.branding.eventName,
       },
     ],
     locale: 'en_IN',
@@ -42,11 +41,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: EVENT_CONFIG.name,
-    description: EVENT_CONFIG.description,
-    images: ['/og-image.jpg'],
+    title: IKIGAI2026_CONFIG.branding.eventName,
+    description: IKIGAI2026_CONFIG.branding.mission,
+    images: [IKIGAI2026_CONFIG.assets.seo.twitterImage],
   },
-  metadataBase: new URL('https://ikigai.acropolis.in'),
+  metadataBase: new URL(IKIGAI2026_CONFIG.social.website),
 };
 
 export default function RootLayout({
@@ -66,6 +65,34 @@ export default function RootLayout({
             </AuthProvider>
           </QueryProvider>
         </ThemeProvider>
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Hackathon",
+              "name": IKIGAI2026_CONFIG.branding.eventName,
+              "description": IKIGAI2026_CONFIG.branding.mission,
+              "startDate": IKIGAI2026_CONFIG.timeline[0].start,
+              "endDate": IKIGAI2026_CONFIG.timeline[IKIGAI2026_CONFIG.timeline.length - 1].end,
+              "location": {
+                "@type": "Place",
+                "name": IKIGAI2026_CONFIG.branding.organizer.institute,
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressLocality": IKIGAI2026_CONFIG.branding.organizer.location,
+                  "addressCountry": "IN"
+                }
+              },
+              "organizer": {
+                "@type": "Organization",
+                "name": IKIGAI2026_CONFIG.branding.organizer.institute,
+                "url": IKIGAI2026_CONFIG.social.website
+              }
+            })
+          }}
+        />
       </body>
     </html>
   );

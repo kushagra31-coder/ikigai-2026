@@ -7,6 +7,7 @@ import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Button } from '@/components/primitives/button';
 import { Icons } from '@/components/constants/icons';
 import { createClient } from '@/lib/supabase/client';
+import IKIGAI2026_CONFIG from '@/config/event.config';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -40,6 +41,9 @@ export const Navbar = () => {
     { name: 'Tracks', href: '/tracks' },
     { name: 'Timeline', href: '/timeline' },
     { name: 'Sponsors', href: '/sponsors' },
+    { name: 'Leadership', href: '/leadership' },
+    { name: 'Downloads', href: '/downloads' },
+    { name: 'Rulebook', href: '/rulebook' },
     { name: 'FAQ', href: '/faq' },
     { name: 'Contact', href: '/contact' },
   ];
@@ -62,7 +66,7 @@ export const Navbar = () => {
             <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
               <Icons.logo className="w-6 h-6 text-primary" />
             </div>
-            <span className="font-bold text-xl tracking-tight">IKIGAI</span>
+            <span className="font-bold text-xl tracking-tight">{IKIGAI2026_CONFIG.branding.eventName.split(' ')[0]}</span>
           </Link>
 
           {/* Desktop Nav */}

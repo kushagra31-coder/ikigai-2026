@@ -1,57 +1,127 @@
-import { createClient } from '@/lib/supabase/client';
+import { IS_MOCKED } from '@/lib/supabase/is-mocked';
 
-export class AuthService {
-  static async signInWithGoogle() {
-    // Mocked for playground since local Supabase might not be running
-    return new Promise(resolve => setTimeout(resolve, 800));
+// ─── Mock Store ────────────────────────────────────────────────────────────────
+// Tracks whether the user has deliberately logged out in mock mode.
+// Uses localStorage so it survives hot-reloads but resets on full page refresh.
+const MOCK_USER = { id: 'mock-user-1', email: 'demo@ikigai2026.com' };
+
+function isMockLoggedOut(): boolean {
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem('mock_logged_out') === 'true';
+}
+
+function setMockLoggedOut(val: boolean) {
+  if (typeof window === 'undefined') return;
+  if (val) {
+    localStorage.setItem('mock_logged_out', 'true');
+  } else {
+    localStorage.removeItem('mock_logged_out');
   }
+}
 
-  static async signInWithEmail(email: string, password: string) {
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    return data;
-  }
+// ─── Auth Service ──────────────────────────────────────────────────────────────
+export const AuthService = {
+  /**
+   * Returns true when Supabase is not configured (no .env.local).
+   * Evaluated from the module-level constant so Turbopack inlines it correctly.
+   */
+  isMocked(): boolean {
+    return IS_MOCKED;
+  },
 
-  static async signUpWithEmail(email: string, password: string, fullName: string) {
+  async signInWithGoogle(): Promise<unknown> {
+    if (IS_MOCKED) {
+      await new Promise(r => setTimeout(r, 600));
+      setMockLoggedOut(false);
+      return { user: MOCK_USER };
+    }
+    const { createClient } = await import('@/lib/supabase/client');
     const supabase = createClient();
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
       options: {
-        data: {
-          full_name: fullName,
-        },
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/callback`,
       },
     });
     if (error) throw error;
     return data;
-  }
+  },
 
-  static async signOut() {
+  async signInWithEmail(email: string, password: string): Promise<unknown> {
+    if (IS_MOCKED) {
+      await new Promise(r => setTimeout(r, 600));
+      setMockLoggedOut(false);
+      return { user: { ...MOCK_USER, email } };
+    }
+    const { createClient } = await import('@/lib/supabase/client');
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return data;
+  },
+
+  async signUpWithEmail(email: string, password: string, fullName: string): Promise<unknown> {
+    if (IS_MOCKED) {
+      await new Promise(r => setTimeout(r, 600));
+      setMockLoggedOut(false);
+      return { user: { ...MOCK_USER, email, user_metadata: { full_name: fullName } } };
+    }
+    const { createClient } = await import('@/lib/supabase/client');
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName } },
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  async signOut(): Promise<void> {
+    if (IS_MOCKED) {
+      await new Promise(r => setTimeout(r, 300));
+      setMockLoggedOut(true);
+      return;
+    }
+    const { createClient } = await import('@/lib/supabase/client');
     const supabase = createClient();
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
-  }
+  },
 
-  static async resetPassword(email: string) {
+  async resetPassword(email: string): Promise<void> {
+    if (IS_MOCKED) {
+      await new Promise(r => setTimeout(r, 600));
+      return;
+    }
+    const { createClient } = await import('@/lib/supabase/client');
     const supabase = createClient();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password`,
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/reset-password`,
     });
     if (error) throw error;
-  }
+  },
 
-  static async updatePassword(password: string) {
+  async updatePassword(password: string): Promise<void> {
+    if (IS_MOCKED) return;
+    const { createClient } = await import('@/lib/supabase/client');
     const supabase = createClient();
     const { error } = await supabase.auth.updateUser({ password });
     if (error) throw error;
-  }
+  },
 
-  static async getSession() {
+  async getSession() {
+    if (IS_MOCKED) {
+      if (isMockLoggedOut()) return null;
+      return {
+        user: MOCK_USER,
+        access_token: 'mock-access-token',
+      };
+    }
+    const { createClient } = await import('@/lib/supabase/client');
     const supabase = createClient();
     const { data: { session }, error } = await supabase.auth.getSession();
     if (error) throw error;
     return session;
-  }
-}
+  },
+};

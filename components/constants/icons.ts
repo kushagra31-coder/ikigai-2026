@@ -60,6 +60,7 @@ import {
   Wifi,
   WifiOff,
   List,
+  FileText,
   type LucideIcon
 } from 'lucide-react';
 
@@ -143,4 +144,5 @@ export const Icons = {
   wifi: Wifi,
   wifiOff: WifiOff,
   list: List,
+  fileText: FileText,
 } as const;

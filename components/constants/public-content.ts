@@ -1,75 +1,68 @@
-import { EVENT_CONFIG } from '@/config/event.config';
+import IKIGAI2026_CONFIG from '@/config/event.config';
 import { Icons } from './icons';
 
 export const PUBLIC_CONTENT = {
   hero: {
-    eventTitle: EVENT_CONFIG.name,
-    tagline: EVENT_CONFIG.type,
-    description: EVENT_CONFIG.description,
+    eventTitle: IKIGAI2026_CONFIG.branding.eventName,
+    tagline: IKIGAI2026_CONFIG.branding.tagline,
+    description: IKIGAI2026_CONFIG.branding.slogan,
     primaryCta: "Register Now",
     secondaryCta: "Learn More",
-    countdownDate: EVENT_CONFIG.timeline.finalRoundStart
+    countdownDate: IKIGAI2026_CONFIG.timeline.find(t => t.id === 'grand-finale')?.start || new Date().toISOString()
   },
   about: {
-    title: `What is ${EVENT_CONFIG.name}?`,
-    vision: EVENT_CONFIG.description,
+    title: `What is ${IKIGAI2026_CONFIG.branding.eventName}?`,
+    vision: IKIGAI2026_CONFIG.branding.mission,
     objectives: "We aim to provide a platform for students to tackle real-world problems using cutting-edge technology.",
-    organizer: `Organized by ${EVENT_CONFIG.organizers}.`,
-    duration: `${EVENT_CONFIG.timeline.hackathonDurationHours} Hours of Non-stop Coding`,
-    venue: EVENT_CONFIG.venue
+    organizer: `Organized by ${IKIGAI2026_CONFIG.branding.organizer.institute}.`,
+    duration: `${IKIGAI2026_CONFIG.statistics.hours} Hours of Non-stop Coding`,
+    venue: IKIGAI2026_CONFIG.branding.organizer.location
   },
   statistics: {
-    tracks: EVENT_CONFIG.tracks.length,
-    mentors: 20, // Remains mocked per rules
-    prizePool: EVENT_CONFIG.prizePool,
-    participants: 300, // Remains mocked per rules
-    hours: EVENT_CONFIG.timeline.hackathonDurationHours
+    tracks: IKIGAI2026_CONFIG.statistics.tracks,
+    mentors: IKIGAI2026_CONFIG.statistics.mentorCount,
+    prizePool: IKIGAI2026_CONFIG.statistics.prizePool,
+    participants: IKIGAI2026_CONFIG.statistics.expectedParticipants,
+    hours: IKIGAI2026_CONFIG.statistics.hours
   },
-  tracks: EVENT_CONFIG.tracks.map(t => ({
+  tracks: IKIGAI2026_CONFIG.tracks.map(t => ({
     id: t.id,
-    title: t.name,
-    description: `Compete in the ${t.name} track.`,
-    icon: t.icon as keyof typeof Icons
+    title: t.title,
+    description: t.description,
+    icon: (t.icon as keyof typeof Icons) || "code"
   })),
-  timeline: [
-    {
-      id: "reg-deadline",
-      title: "Registration Deadline",
-      date: new Date(EVENT_CONFIG.timeline.registrationDeadline).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-      status: "upcoming"
-    },
-    {
-      id: "event-starts",
-      title: "Hackathon Begins",
-      date: new Date(EVENT_CONFIG.timeline.finalRoundStart).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-      status: "upcoming"
-    }
-  ],
-  sponsors: EVENT_CONFIG.sponsors.map((name, idx) => ({
+  timeline: IKIGAI2026_CONFIG.timeline.map(t => ({
+    id: t.id,
+    title: t.title,
+    date: new Date(t.start).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+    status: t.status
+  })),
+  sponsors: IKIGAI2026_CONFIG.sponsors.map((s, idx) => ({
     id: `sponsor-${idx}`,
-    name,
-    logo: "/placeholder-sponsor.svg",
-    website: "#",
-    tier: "Partner"
+    name: s.name,
+    logo: s.logo,
+    website: s.website,
+    tier: s.category
   })),
-  faq: EVENT_CONFIG.faqs.map((f, i) => ({
+  faq: IKIGAI2026_CONFIG.branding.faqs.map((f, i) => ({
     id: `faq-${i}`,
     question: f.question,
     answer: f.answer
   })),
   contact: {
-    email: EVENT_CONFIG.contacts.email,
-    phone: EVENT_CONFIG.contacts.phone,
-    facultyCoords: "TBD",
-    studentCoords: "TBD",
+    email: IKIGAI2026_CONFIG.contacts.generalSupport.email,
+    phone: IKIGAI2026_CONFIG.contacts.generalSupport.phone || "TBD",
+    facultyCoords: IKIGAI2026_CONFIG.leadership.filter(l => l.designation.includes("Faculty")).map(l => l.name).join(", "),
+    studentCoords: IKIGAI2026_CONFIG.leadership.filter(l => l.designation.includes("Student")).map(l => l.name).join(", "),
     socialLinks: {
-      instagram: "#",
-      linkedin: "#",
-      github: "#"
+      instagram: IKIGAI2026_CONFIG.social.instagram,
+      linkedin: "#", // Add if available
+      github: "#", // Add if available
+      website: IKIGAI2026_CONFIG.social.website
     }
   },
   footer: {
-    copyright: `© 2026 ${EVENT_CONFIG.name}. Made with ❤️`,
+    copyright: `© 2026 ${IKIGAI2026_CONFIG.branding.eventName}. Made with ❤️`,
     links: [
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms of Service", href: "/terms" }
