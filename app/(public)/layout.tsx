@@ -1,0 +1,41 @@
+import { Navbar } from '@/components/landing/Navbar';
+import { Footer } from '@/components/landing/Footer';
+import { ReactNode } from 'react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'IKIGAI 2026 | Innovate. Build. Transform.',
+  description: 'The ultimate 36-hour hackathon to test your limits, build innovative solutions, and shape the future.',
+  openGraph: {
+    title: 'IKIGAI 2026',
+    description: 'The ultimate 36-hour hackathon.',
+    url: 'https://ikigai.example.com',
+    siteName: 'IKIGAI 2026',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'IKIGAI 2026',
+    description: 'The ultimate 36-hour hackathon.',
+  }
+};
+
+export default function PublicLayout({ children }: { children: ReactNode }) {
+  return (
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      {/* Global Animated Background Overlay */}
+      <div className="fixed inset-0 z-[-1] bg-background">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background" />
+        {/* Subtle animated floating glow spots */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] animate-pulse pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-[120px] animate-pulse pointer-events-none animation-delay-2000" />
+      </div>
+
+      <Navbar />
+      <main className="flex-1 flex flex-col pt-20">
+        {children}
+      </main>
+      <Footer />
+    </div>
+  );
+}

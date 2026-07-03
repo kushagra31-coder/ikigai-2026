@@ -1,0 +1,11 @@
+export type Role = 'ADMIN' | 'MENTOR' | 'PARTICIPANT' | 'GUEST';
+
+export type AdminPermission = 
+  | 'MANAGE_TEAMS'
+  | 'MANAGE_MENTORS'
+  | 'MANAGE_TRACKS'
+  | 'MANAGE_SESSIONS'
+  | 'MANAGE_SETTINGS'
+  | 'MANAGE_LEADERBOARD'
+  | 'MANAGE_ANNOUNCEMENTS'
+  | 'MANAGE_LOGS';

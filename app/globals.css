@@ -1,26 +1,155 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-glow: 0 0 15px -3px var(--primary);
+  --shadow-glow-purple: 0 0 20px -3px rgba(168, 85, 247, 0.4);
+  --shadow-glow-cyan: 0 0 20px -3px rgba(34, 211, 238, 0.4);
+  
+  --spacing-section: 4rem;
+  --spacing-container: 2rem;
+
+  --font-sans: var(--font-geist-sans), Inter, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
 }
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #030014;
+    --foreground: #f8fafc;
+
+    --card: #0b0726;
+    --card-foreground: #f8fafc;
+
+    --popover: #0b0726;
+    --popover-foreground: #f8fafc;
+
+    --primary: #9333ea;
+    --primary-foreground: #ffffff;
+
+    --secondary: #d946ef;
+    --secondary-foreground: #ffffff;
+
+    --accent: #06b6d4;
+    --accent-foreground: #ffffff;
+
+    --muted: #1e1b4b;
+    --muted-foreground: #94a3b8;
+
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+
+    --success: #22c55e;
+    --success-foreground: #ffffff;
+
+    --warning: #f59e0b;
+    --warning-foreground: #ffffff;
+
+    --info: #3b82f6;
+    --info-foreground: #ffffff;
+
+    --border: #312e81;
+    --input: #1e1b4b;
+    --ring: #9333ea;
+
+    --radius-xs: 0.125rem;
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 1rem;
+    --radius-full: 9999px;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .glass {
+    @apply bg-card/40 backdrop-blur-md border border-white/10;
+  }
+  .glass-panel {
+    @apply bg-background/60 backdrop-blur-lg border-b border-white/10;
+  }
+  .text-display {
+    @apply text-5xl md:text-7xl font-extrabold tracking-tight;
+  }
+  .text-hero {
+    @apply text-4xl md:text-6xl font-bold tracking-tight;
+  }
+  .text-heading-xl {
+    @apply text-3xl md:text-5xl font-bold tracking-tight;
+  }
+  .text-heading-l {
+    @apply text-2xl md:text-4xl font-semibold tracking-tight;
+  }
+  .text-heading-m {
+    @apply text-xl md:text-2xl font-semibold;
+  }
+  .text-heading-s {
+    @apply text-lg font-medium;
+  }
+  .text-body-l {
+    @apply text-lg;
+  }
+  .text-body-m {
+    @apply text-base;
+  }
+  .text-body-s {
+    @apply text-sm;
+  }
+  .text-caption {
+    @apply text-xs text-muted-foreground;
+  }
+  .text-tiny {
+    @apply text-[10px] text-muted-foreground uppercase tracking-wider;
+  }
 }
