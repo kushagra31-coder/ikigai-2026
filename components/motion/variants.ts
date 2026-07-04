@@ -20,6 +20,11 @@ export const slideRightVariants: Variants = {
   visible: { opacity: 1, x: 0 }
 };
 
+export const slideLeftVariants: Variants = {
+  hidden: { opacity: 0, x: 30 },
+  visible: { opacity: 1, x: 0 }
+};
+
 export const scaleVariants: Variants = {
   hidden: { opacity: 0, scale: 0.95 },
   visible: { opacity: 1, scale: 1 }

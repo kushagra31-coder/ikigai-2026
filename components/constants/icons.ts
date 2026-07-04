@@ -62,6 +62,7 @@ import {
   List,
   FileText,
   MessageCircle,
+  Database,
   type LucideIcon
 } from 'lucide-react';
 
@@ -147,4 +148,5 @@ export const Icons = {
   list: List,
   fileText: FileText,
   whatsapp: MessageCircle,
+  database: Database,
 } as const;

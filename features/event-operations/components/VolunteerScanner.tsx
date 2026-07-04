@@ -83,21 +83,41 @@ export function VolunteerScanner() {
           </div>
 
           {!lastResult && (
-            <div className="aspect-square bg-black/50 border-2 border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center relative overflow-hidden">
-              {isScanning ? (
-                <div className="text-primary flex flex-col items-center">
-                  <Icons.spinner className="w-8 h-8 animate-spin mb-2" />
-                  Processing...
-                </div>
-              ) : (
-                <>
-                  <div className="w-[70%] h-[70%] border border-primary/50 relative">
-                    {/* Scanner line animation */}
-                    <div className="absolute top-0 left-0 w-full h-0.5 bg-primary shadow-[0_0_8px_rgba(var(--primary),1)] animate-[scan_2s_ease-in-out_infinite]" />
+            <div className="flex flex-col gap-4">
+              <div className="aspect-square bg-black/50 border-2 border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center relative overflow-hidden">
+                {isScanning ? (
+                  <div className="text-primary flex flex-col items-center">
+                    <Icons.spinner className="w-8 h-8 animate-spin mb-2" />
+                    Processing...
                   </div>
-                  <p className="absolute bottom-6 text-sm text-muted-foreground font-mono">Awaiting QR...</p>
-                </>
-              )}
+                ) : (
+                  <>
+                    <div className="w-[70%] h-[70%] border border-primary/50 relative">
+                      {/* Scanner line animation */}
+                      <div className="absolute top-0 left-0 w-full h-0.5 bg-primary shadow-[0_0_8px_rgba(var(--primary),1)] animate-[scan_2s_ease-in-out_infinite]" />
+                    </div>
+                    <p className="absolute bottom-6 text-sm text-muted-foreground font-mono">Awaiting Camera Scan...</p>
+                  </>
+                )}
+              </div>
+              
+              <div className="flex flex-col items-center gap-2 pt-2 border-t border-white/10">
+                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Or Manual Entry</span>
+                <div className="flex gap-2 w-full">
+                  <input 
+                    type="text" 
+                    placeholder="Enter Pass ID (e.g. pass_1)" 
+                    className="flex-1 bg-background border border-white/10 rounded-md p-2 text-sm text-center font-mono uppercase focus:border-primary focus:outline-none"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const val = e.currentTarget.value.trim().toLowerCase();
+                        if (val) handleMockScan(val);
+                      }
+                    }}
+                    disabled={isScanning}
+                  />
+                </div>
+              </div>
             </div>
           )}
 

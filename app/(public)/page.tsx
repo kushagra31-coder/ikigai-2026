@@ -6,16 +6,37 @@ import { LandingIntroWrapper } from '@/components/landing/animations/LandingIntr
 import { Countdown } from '@/components/landing/hero/Countdown';
 import { PUBLIC_CONTENT } from '@/components/constants/public-content';
 import { Icons, IconType } from '@/components/constants/icons';
+import { SponsorCard } from '@/components/landing/SponsorCard';
 import Link from 'next/link';
-import Image from 'next/image';
+
+import SoftAurora from '@/components/ui/SoftAurora';
+import FlowingMenu from '@/components/ui/FlowingMenu';
+import { LandingDock } from '@/components/landing/LandingDock';
 
 export default function Home() {
+  const flowingMenuItems = [
+    { link: '#', text: 'Hackathon', image: '/images/sponsors/unstop.png' },
+    { link: '#', text: 'Innovation', image: '/images/sponsors/tcs.png' },
+    { link: '#', text: 'Technology', image: '/images/sponsors/acropolis.png' },
+    { link: '#', text: 'Future', image: '/images/sponsors/csit.png' }
+  ];
+
   return (
     <>
       <LandingIntroWrapper />
       
-      {/* Hero Section */}
+      {/* Hero Section with SoftAurora Background */}
       <section className="relative min-h-[90vh] flex flex-col justify-center items-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <SoftAurora 
+            color1="#120F17" 
+            color2="#8B5CF6" 
+            speed={0.8}
+            enableMouseInteraction={true}
+          />
+        </div>
+        <div className="absolute inset-0 z-0 bg-background/50 backdrop-blur-[2px]" />
+        
         <Container className="relative z-10 text-center">
           <Fade delay={0.1} duration="slow">
             <h1 className="text-display md:text-[6rem] font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/40 leading-tight">
@@ -133,7 +154,7 @@ export default function Home() {
       </Section>
 
       {/* Sponsors Section */}
-      <Section className="relative">
+      <Section id="sponsors" className="relative">
         <Container>
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
             <h2 className="text-heading-xl md:text-[4rem] font-black leading-tight">Our Sponsors</h2>
@@ -144,28 +165,13 @@ export default function Home() {
           
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {PUBLIC_CONTENT.sponsors.map((sponsor) => (
-              <GlassCard key={sponsor.id} className="p-4 flex flex-col items-center justify-center min-h-[120px] group border-white/5 hover:border-primary/30 transition-colors bg-white/5 hover:bg-white/10 relative overflow-hidden">
-                <div className="relative w-full h-14 mb-2 flex items-center justify-center">
-                  <Image
-                    src={sponsor.logo}
-                    alt={`${sponsor.name} Logo`}
-                    fill
-                    className="object-contain filter grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
-                    sizes="(max-width: 768px) 50vw, 20vw"
-                    loading="lazy"
-                    onError={(e) => {
-                      const target = e.currentTarget as HTMLImageElement;
-                      target.style.display = 'none';
-                      const parent = target.parentElement;
-                      if (parent) {
-                        parent.innerHTML = `<div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary font-black text-sm">${sponsor.name.substring(0, 2).toUpperCase()}</div>`;
-                      }
-                    }}
-                  />
-                </div>
-                <h3 className="text-[10px] font-bold text-center tracking-wider uppercase text-muted-foreground group-hover:text-foreground transition-colors line-clamp-2 leading-tight">{sponsor.name}</h3>
-                <span className="absolute top-1.5 right-1.5 text-[8px] uppercase text-primary/50 font-bold">{sponsor.tier}</span>
-              </GlassCard>
+              <SponsorCard
+                key={sponsor.id}
+                id={sponsor.id}
+                name={sponsor.name}
+                logo={sponsor.logo}
+                tier={sponsor.tier}
+              />
             ))}
           </div>
 
@@ -209,6 +215,19 @@ export default function Home() {
         </Container>
       </Section>
 
+      {/* Flowing Menu Section */}
+      <div className="h-[400px] w-full relative overflow-hidden bg-background border-y border-white/10">
+        <FlowingMenu 
+          items={flowingMenuItems}
+          speed={20}
+          textColor="#ffffff"
+          bgColor="#0D0A11"
+          marqueeBgColor="#8B5CF6"
+          marqueeTextColor="#ffffff"
+          borderColor="#333333"
+        />
+      </div>
+
       {/* CTA Section */}
       <Section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-primary/10" />
@@ -226,6 +245,9 @@ export default function Home() {
           </Scale>
         </Container>
       </Section>
+
+      {/* Global Dock */}
+      <LandingDock />
     </>
   );
 }

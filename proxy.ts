@@ -5,7 +5,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const IS_MOCKED = !SUPABASE_URL || SUPABASE_URL.trim() === '' || SUPABASE_URL === 'undefined';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // If no Supabase config, allow all traffic through (mock/dev mode)
   if (IS_MOCKED) {
     return NextResponse.next({ request });

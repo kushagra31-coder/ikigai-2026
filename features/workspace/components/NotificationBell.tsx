@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Icons } from '@/components/constants/icons';
 import { Button } from '@/components/primitives/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PushNotificationManager } from './PushNotificationManager';
 
 export const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -67,9 +68,12 @@ export const NotificationBell = () => {
               </div>
               
               <div className="p-2 border-t border-white/10 bg-muted/20">
-                <Button variant="ghost" className="w-full text-xs h-8">
+                <Button variant="ghost" className="w-full text-xs h-8 mb-2">
                   Mark all as read
                 </Button>
+                <div className="px-2 pb-2">
+                  <PushNotificationManager />
+                </div>
               </div>
             </motion.div>
           </>

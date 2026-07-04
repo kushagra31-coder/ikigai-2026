@@ -1,12 +1,12 @@
 'use client';
 
 import { motion, HTMLMotionProps } from 'framer-motion';
-import { slideUpVariants, slideDownVariants, slideRightVariants } from '../variants';
+import { slideUpVariants, slideDownVariants, slideRightVariants, slideLeftVariants } from '../variants';
 import { transitions } from '../transitions';
 
 interface SlideProps extends HTMLMotionProps<"div"> {
   delay?: number;
-  direction?: 'up' | 'down' | 'right';
+  direction?: 'up' | 'down' | 'right' | 'left';
   duration?: 'fast' | 'normal' | 'slow';
 }
 
@@ -17,7 +17,7 @@ export const Slide = ({
   duration = 'normal', 
   ...props 
 }: SlideProps) => {
-  const variants = direction === 'up' ? slideUpVariants : direction === 'down' ? slideDownVariants : slideRightVariants;
+  const variants = direction === 'up' ? slideUpVariants : direction === 'down' ? slideDownVariants : direction === 'right' ? slideRightVariants : slideLeftVariants;
   
   return (
     <motion.div
