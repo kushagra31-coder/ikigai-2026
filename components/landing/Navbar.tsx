@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Button } from '@/components/primitives/button';
 import { Icons } from '@/components/constants/icons';
-import { createClient } from '@/lib/supabase/client';
+import { AuthService } from '@/features/authentication/services/auth.service';
 import IKIGAI2026_CONFIG from '@/config/event.config';
 
 export const Navbar = () => {
@@ -19,9 +19,12 @@ export const Navbar = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
+      try {
+        const session = await AuthService.getSession();
+        setIsAuthenticated(!!session);
+      } catch {
+        setIsAuthenticated(false);
+      }
     };
     checkAuth();
   }, []);

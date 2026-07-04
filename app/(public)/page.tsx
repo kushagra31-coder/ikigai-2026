@@ -145,7 +145,7 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {PUBLIC_CONTENT.sponsors.map((sponsor) => (
               <GlassCard key={sponsor.id} className="p-4 flex flex-col items-center justify-center min-h-[120px] group border-white/5 hover:border-primary/30 transition-colors bg-white/5 hover:bg-white/10 relative overflow-hidden">
-                <div className="relative w-full h-16 mb-2">
+                <div className="relative w-full h-14 mb-2 flex items-center justify-center">
                   <Image
                     src={sponsor.logo}
                     alt={`${sponsor.name} Logo`}
@@ -153,13 +153,22 @@ export default function Home() {
                     className="object-contain filter grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
                     sizes="(max-width: 768px) 50vw, 20vw"
                     loading="lazy"
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = `<div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary font-black text-sm">${sponsor.name.substring(0, 2).toUpperCase()}</div>`;
+                      }
+                    }}
                   />
                 </div>
-                <h3 className="text-xs font-bold text-center tracking-wider uppercase text-muted-foreground group-hover:text-foreground transition-colors line-clamp-1">{sponsor.name}</h3>
-                <span className="absolute top-2 right-2 text-[10px] uppercase text-primary/50">{sponsor.tier}</span>
+                <h3 className="text-[10px] font-bold text-center tracking-wider uppercase text-muted-foreground group-hover:text-foreground transition-colors line-clamp-2 leading-tight">{sponsor.name}</h3>
+                <span className="absolute top-1.5 right-1.5 text-[8px] uppercase text-primary/50 font-bold">{sponsor.tier}</span>
               </GlassCard>
             ))}
           </div>
+
         </Container>
       </Section>
 

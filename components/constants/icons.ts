@@ -61,6 +61,7 @@ import {
   WifiOff,
   List,
   FileText,
+  MessageCircle,
   type LucideIcon
 } from 'lucide-react';
 
@@ -145,4 +146,5 @@ export const Icons = {
   wifiOff: WifiOff,
   list: List,
   fileText: FileText,
+  whatsapp: MessageCircle,
 } as const;

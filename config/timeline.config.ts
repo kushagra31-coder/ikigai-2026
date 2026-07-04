@@ -1,50 +1,96 @@
 export const TIMELINE_CONFIG = [
   {
-    id: "round1",
-    title: "Round 1: Online Idea Submission",
+    id: "registrations-open",
+    title: "Registrations Open",
+    type: "registration",
+    start: "2026-07-01T00:00:00+05:30",
+    end: "2026-08-05T23:59:59+05:30",
+    description: "Teams can start registering and forming groups.",
+    attachments: [],
+    notes: ["One female member mandatory", "Team size: 2–4 members"],
+    status: "completed"
+  },
+  {
+    id: "idea-submission",
+    title: "Idea Submission",
     type: "submission",
-    start: "2026-06-30T00:00:00Z",
-    end: "2026-07-25T23:59:59Z",
-    description: "Submit your initial ideas and project proposals online.",
+    start: "2026-08-05T00:00:00+05:30",
+    end: "2026-08-05T23:59:59+05:30",
+    description: "Submit your innovative project idea for screening.",
     attachments: [
       { name: "PPT Template", url: "/downloads/ppt-template.pptx" },
       { name: "Problem Statement", url: "/downloads/problem-statement.pdf" }
     ],
     notes: [
       "Maximum 12 Slides",
-      "One PPT/PDF",
+      "Submit as PPT or PDF",
       "One female member mandatory"
-    ],
-    status: "completed" // compute dynamically later or leave static
-  },
-  {
-    id: "screening",
-    title: "Screening & Shortlisting",
-    type: "evaluation",
-    start: "2026-06-30T00:00:00Z",
-    end: "2026-08-05T23:59:59Z",
-    description: "Evaluation of ideas, shortlisting of teams, and notification.",
-    attachments: [],
-    notes: [
-      "Judges decision is final",
-      "Shortlisted teams will be notified via email"
     ],
     status: "upcoming"
   },
   {
-    id: "grand-finale",
-    title: "Grand Finale: 36 Hours Offline Hackathon",
-    type: "event",
-    start: "2026-08-21T09:00:00Z",
-    end: "2026-08-23T21:00:00Z",
-    description: "The ultimate 36-hour offline hackathon experience at the Acropolis campus.",
-    attachments: [
-      { name: "Schedule", url: "/images/posters/schedule.jpg" }
-    ],
+    id: "screening-results",
+    title: "Screening Results",
+    type: "evaluation",
+    start: "2026-08-10T00:00:00+05:30",
+    end: "2026-08-10T23:59:59+05:30",
+    description: "Selected teams move to the final offline round.",
+    attachments: [],
     notes: [
-      "Bring your own hardware",
-      "Food and accommodation provided"
+      "Shortlisted teams notified via email",
+      "Judge's decision is final"
     ],
+    status: "upcoming"
+  },
+  {
+    id: "opening-ceremony",
+    title: "Opening Ceremony",
+    type: "event",
+    start: "2026-08-21T09:00:00+05:30",
+    end: "2026-08-21T11:00:00+05:30",
+    description: "Keynotes, networking and official hackathon kickoff.",
+    attachments: [],
+    notes: ["Report by 8:30 AM", "Attendance mandatory"],
+    status: "upcoming"
+  },
+  {
+    id: "grand-finale",
+    title: "36 Hours of Hacking",
+    type: "event",
+    start: "2026-08-21T11:00:00+05:30",
+    end: "2026-08-22T23:00:00+05:30",
+    description: "Build, innovate and collaborate with mentors at the Acropolis campus.",
+    attachments: [],
+    notes: [
+      "Food and accommodation provided",
+      "Mentors available round the clock",
+      "Bring your own hardware"
+    ],
+    status: "upcoming"
+  },
+  {
+    id: "final-presentations",
+    title: "Final Presentations",
+    type: "presentation",
+    start: "2026-08-23T09:00:00+05:30",
+    end: "2026-08-23T15:00:00+05:30",
+    description: "Teams showcase solutions before judges.",
+    attachments: [],
+    notes: [
+      "Each team gets 10 minutes to present",
+      "Demo must be live"
+    ],
+    status: "upcoming"
+  },
+  {
+    id: "winners-ceremony",
+    title: "Winners & Closing Ceremony",
+    type: "ceremony",
+    start: "2026-08-23T16:00:00+05:30",
+    end: "2026-08-23T20:00:00+05:30",
+    description: "Prize distribution, networking and event wrap-up.",
+    attachments: [],
+    notes: ["All teams must be present", "Certificates distributed"],
     status: "upcoming"
   }
 ];
