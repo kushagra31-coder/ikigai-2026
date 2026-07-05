@@ -1,4 +1,5 @@
 'use client';
+// Force rebuild to clear hydration cache
 
 import { Container, Section, Grid } from '@/components/layout';
 import { Fade, Scale, Hover } from '@/components/motion';
@@ -19,18 +20,19 @@ function SponsorCard({ sponsor, idx }: { sponsor: any; idx: number }) {
           rel="noreferrer"
           className="block h-full"
         >
-          <GlassCard className="h-full flex flex-col items-center justify-center text-center group border-white/5 hover:border-primary/50 p-6 min-h-[160px] relative overflow-hidden">
+          <GlassCard className="h-full flex flex-col items-center justify-center text-center group border-white/5 hover:border-primary/50 p-6 min-h-[200px] relative overflow-hidden">
             <span className="absolute top-2 right-2 text-[9px] font-bold uppercase tracking-wider text-primary/60">
               {sponsor.category}
             </span>
 
-            <div className="relative w-full h-16 mb-4 flex items-center justify-center">
+            <div className="w-full flex items-center justify-center mb-4">
+              <div className="relative bg-white rounded-xl p-3 w-36 h-20 flex items-center justify-center shadow-md group-hover:shadow-primary/20 group-hover:shadow-lg transition-shadow duration-300">
               {!imgError ? (
                 <Image
                   src={sponsor.logo}
                   alt={`${sponsor.name} Logo`}
                   fill
-                  className="object-contain filter brightness-90 group-hover:brightness-110 transition-all duration-300"
+                  className="object-contain p-2 transition-all duration-300 group-hover:scale-105"
                   sizes="(max-width: 768px) 50vw, 20vw"
                   loading="lazy"
                   onError={() => setImgError(true)}
@@ -43,6 +45,7 @@ function SponsorCard({ sponsor, idx }: { sponsor: any; idx: number }) {
                   {sponsor.shortName?.substring(0, 2).toUpperCase() || sponsor.name.substring(0, 2).toUpperCase()}
                 </div>
               )}
+              </div>
             </div>
 
             <h3 className="text-xs font-bold text-center tracking-wide text-muted-foreground group-hover:text-foreground transition-colors leading-tight">

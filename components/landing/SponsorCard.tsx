@@ -1,4 +1,5 @@
 'use client';
+// Force rebuild to clear hydration cache
 
 import Image from 'next/image';
 import { useState } from 'react';
@@ -9,13 +10,14 @@ interface SponsorCardProps {
   name: string;
   logo: string;
   tier: string;
+  website?: string;
 }
 
-export function SponsorCard({ name, logo, tier }: SponsorCardProps) {
+export function SponsorCard({ name, logo, tier, website }: SponsorCardProps) {
   const [imgError, setImgError] = useState(false);
   const initials = name.substring(0, 2).toUpperCase();
 
-  return (
+  const content = (
     <div className="p-4 flex flex-col items-center justify-center min-h-[160px] group relative transition-transform hover:scale-105">
       <div className="relative w-[80%] h-24 mb-4 flex items-center justify-center">
         {!imgError ? (
@@ -40,4 +42,14 @@ export function SponsorCard({ name, logo, tier }: SponsorCardProps) {
       <span className="text-[10px] uppercase text-primary/50 font-bold mt-2 tracking-widest">{tier}</span>
     </div>
   );
+
+  if (website && website !== '#') {
+    return (
+      <a href={website} target="_blank" rel="noreferrer" className="block h-full">
+        {content}
+      </a>
+    );
+  }
+
+  return content;
 }

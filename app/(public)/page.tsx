@@ -4,6 +4,7 @@ import { GlassCard } from '@/components/data-display/GlassCard';
 import { Fade, Slide, Scale, Hover } from '@/components/motion';
 import { LandingIntroWrapper } from '@/components/landing/animations/LandingIntroWrapper';
 import { Countdown } from '@/components/landing/hero/Countdown';
+// Force rebuild to clear hydration cache
 import { PUBLIC_CONTENT } from '@/components/constants/public-content';
 import { Icons, IconType } from '@/components/constants/icons';
 import { SponsorCard } from '@/components/landing/SponsorCard';
@@ -11,7 +12,6 @@ import Link from 'next/link';
 
 import SoftAurora from '@/components/ui/SoftAurora';
 import FlowingMenu from '@/components/ui/FlowingMenu';
-import { LandingDock } from '@/components/landing/LandingDock';
 
 export default function Home() {
   const flowingMenuItems = [
@@ -25,17 +25,9 @@ export default function Home() {
     <>
       <LandingIntroWrapper />
       
-      {/* Hero Section with SoftAurora Background */}
+      {/* Hero Section */}
       <section className="relative min-h-[90vh] flex flex-col justify-center items-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <SoftAurora 
-            color1="#120F17" 
-            color2="#8B5CF6" 
-            speed={0.8}
-            enableMouseInteraction={true}
-          />
-        </div>
-        <div className="absolute inset-0 z-0 bg-background/50 backdrop-blur-[2px]" />
+        {/* We rely on the global layout background here now */}
         
         <Container className="relative z-10 text-center">
           <Fade delay={0.1} duration="slow">
@@ -132,12 +124,12 @@ export default function Home() {
             </p>
           </div>
           
-          <Grid className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex flex-wrap justify-center gap-6">
             {PUBLIC_CONTENT.tracks.map((track, idx) => {
               const IconComp = Icons[track.icon as keyof typeof Icons] as IconType;
               return (
-                <Scale key={track.id} delay={idx * 0.1}>
-                  <Hover>
+                <Scale key={track.id} delay={idx * 0.1} className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]">
+                  <Hover className="h-full">
                     <GlassCard className="h-full flex flex-col group border-white/5 hover:border-primary/50">
                       <div className="p-4 rounded-xl bg-primary/10 w-fit mb-6 group-hover:scale-110 transition-transform">
                         {IconComp && <IconComp className="w-8 h-8 text-primary" />}
@@ -149,7 +141,7 @@ export default function Home() {
                 </Scale>
               );
             })}
-          </Grid>
+          </div>
         </Container>
       </Section>
 
@@ -171,6 +163,7 @@ export default function Home() {
                 name={sponsor.name}
                 logo={sponsor.logo}
                 tier={sponsor.tier}
+                website={sponsor.website}
               />
             ))}
           </div>
@@ -245,9 +238,6 @@ export default function Home() {
           </Scale>
         </Container>
       </Section>
-
-      {/* Global Dock */}
-      <LandingDock />
     </>
   );
 }

@@ -17,6 +17,8 @@ import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 import IKIGAI2026_CONFIG from "@/config/event.config";
+import GradientBlinds from "@/components/ui/GradientBlinds";
+
 export const metadata: Metadata = {
   title: {
     template: `%s | ${IKIGAI2026_CONFIG.branding.eventName}`,
@@ -56,8 +58,24 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen relative`}
       >
+        <div className="fixed inset-0 z-[-1] pointer-events-none">
+          <GradientBlinds
+            gradientColors={['#120F17', '#8B5CF6', '#06b6d4']}
+            angle={45}
+            noise={0.1}
+            blindCount={12}
+            blindMinWidth={60}
+            spotlightRadius={0.7}
+            spotlightSoftness={1}
+            spotlightOpacity={1.5}
+            mouseDampening={0.15}
+            distortAmount={0}
+            shineDirection="left"
+            mixBlendMode="normal"
+          />
+        </div>
         <ThemeProvider defaultTheme="dark">
           <QueryProvider>
             <AuthProvider>

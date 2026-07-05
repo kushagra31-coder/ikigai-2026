@@ -1,3 +1,4 @@
+// Force rebuild to clear hydration cache
 export const SPONSORS_CONFIG = [
   {
     name: "Acropolis Institute of Technology and Research",
@@ -12,7 +13,7 @@ export const SPONSORS_CONFIG = [
     name: "CSIT Department",
     shortName: "CSIT",
     logo: "/images/sponsors/csit.png",
-    website: "https://acropolis.in",
+    website: "https://aitr.ac.in/computer-science-and-information-technology-csit/",
     category: "Organized By",
     priority: 2,
     color: "#7c3aed"
@@ -20,7 +21,7 @@ export const SPONSORS_CONFIG = [
   {
     name: "CY Department",
     shortName: "CY",
-    logo: "/images/sponsors/cy.png",
+    logo: "/images/sponsors/cy-logo.png",
     website: "https://acropolis.in",
     category: "Organized By",
     priority: 3,
@@ -75,7 +76,7 @@ export const SPONSORS_CONFIG = [
     name: "Claygrounds",
     shortName: "Clay",
     logo: "/images/sponsors/claygrounds.png",
-    website: "#",
+    website: "https://claygrounds.in",
     category: "Community Partner",
     priority: 9,
     color: "#b45309"
@@ -84,7 +85,7 @@ export const SPONSORS_CONFIG = [
     name: "SportsAlgo",
     shortName: "SA",
     logo: "/images/sponsors/sportsalgo.png",
-    website: "#",
+    website: "https://sportsalgo.in",
     category: "Associate Partner",
     priority: 10,
     color: "#15803d"
