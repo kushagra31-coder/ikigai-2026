@@ -11,7 +11,7 @@ import { SponsorCard } from '@/components/landing/SponsorCard';
 import Link from 'next/link';
 
 import SoftAurora from '@/components/ui/SoftAurora';
-import FlowingMenu from '@/components/ui/FlowingMenu';
+import GlitchText from '@/components/ui/GlitchText';
 
 export default function Home() {
   const flowingMenuItems = [
@@ -31,14 +31,14 @@ export default function Home() {
         
         <Container className="relative z-10 text-center">
           <Fade delay={0.1} duration="slow">
-            <h1 className="text-display md:text-[6rem] font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/40 leading-tight">
+            <h1 className="text-display md:text-[8rem] font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-secondary to-accent leading-none">
               {PUBLIC_CONTENT.hero.eventTitle}
             </h1>
           </Fade>
           
           <Fade delay={0.2} duration="slow">
             <p className="mt-6 text-heading-l md:text-heading-xl text-primary font-bold tracking-tight">
-              {PUBLIC_CONTENT.hero.tagline}
+              <GlitchText text={PUBLIC_CONTENT.hero.tagline} delay={500} />
             </p>
           </Fade>
           
@@ -48,15 +48,48 @@ export default function Home() {
             </p>
           </Fade>
           
-          <Fade delay={0.4}>
             <Flex className="mt-10 justify-center gap-4">
-              <Button asChild size="lg" variant="primary" className="text-base px-8 h-12 shadow-glow">
+              <Button asChild size="lg" variant="primary" className="text-base px-8 h-12">
                 <Link href="/login?mode=register">{PUBLIC_CONTENT.hero.primaryCta}</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="text-base px-8 h-12 backdrop-blur-sm">
+              <Button asChild size="lg" variant="default" className="text-base px-8 h-12">
                 <Link href="#about">{PUBLIC_CONTENT.hero.secondaryCta}</Link>
               </Button>
             </Flex>
+
+          {/* Official Brutalist Stats Row */}
+          <Fade delay={0.5}>
+            <div className="mt-16 flex flex-wrap justify-center gap-6">
+              <div className="flex items-center gap-4 bg-white/80 backdrop-blur-md border border-black/5 p-4 rounded-2xl shadow-xl shadow-purple-900/5 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-900/10 transition-all duration-300">
+                <div className="bg-primary/20 p-3 rounded-full">
+                  <Icons.users className="w-8 h-8 text-primary" />
+                </div>
+                <div className="text-left">
+                  <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Participation</div>
+                  <div className="text-3xl font-black">50+ <span className="text-base font-bold text-muted-foreground">TEAMS</span></div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4 bg-white/80 backdrop-blur-md border border-black/5 p-4 rounded-2xl shadow-xl shadow-purple-900/5 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-900/10 transition-all duration-300">
+                <div className="bg-primary/20 p-3 rounded-full">
+                  <Icons.trophy className="w-8 h-8 text-primary" />
+                </div>
+                <div className="text-left">
+                  <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Prize Pool</div>
+                  <div className="text-3xl font-black">₹103000</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 bg-white/80 backdrop-blur-md border border-black/5 p-4 rounded-2xl shadow-xl shadow-purple-900/5 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-900/10 transition-all duration-300">
+                <div className="bg-primary/20 p-3 rounded-full">
+                  <Icons.clock className="w-8 h-8 text-primary" />
+                </div>
+                <div className="text-left">
+                  <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">36 Hours</div>
+                  <div className="text-xs font-bold text-muted-foreground">BUILD • INNOVATE • IMPACT</div>
+                </div>
+              </div>
+            </div>
           </Fade>
           
           <Countdown targetDate={PUBLIC_CONTENT.hero.countdownDate} />
@@ -128,9 +161,9 @@ export default function Home() {
             {PUBLIC_CONTENT.tracks.map((track, idx) => {
               const IconComp = Icons[track.icon as keyof typeof Icons] as IconType;
               return (
-                <Scale key={track.id} delay={idx * 0.1} className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]">
-                  <Hover className="h-full">
-                    <GlassCard className="h-full flex flex-col group border-white/5 hover:border-primary/50">
+                <Scale key={track.id} delay={idx * 0.1} className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] flex">
+                  <Hover className="w-full flex">
+                    <GlassCard className="w-full flex flex-col group border-black/5 hover:border-primary/50">
                       <div className="p-4 rounded-xl bg-primary/10 w-fit mb-6 group-hover:scale-110 transition-transform">
                         {IconComp && <IconComp className="w-8 h-8 text-primary" />}
                       </div>
@@ -208,18 +241,6 @@ export default function Home() {
         </Container>
       </Section>
 
-      {/* Flowing Menu Section */}
-      <div className="h-[400px] w-full relative overflow-hidden bg-background border-y border-white/10">
-        <FlowingMenu 
-          items={flowingMenuItems}
-          speed={20}
-          textColor="#ffffff"
-          bgColor="#0D0A11"
-          marqueeBgColor="#8B5CF6"
-          marqueeTextColor="#ffffff"
-          borderColor="#333333"
-        />
-      </div>
 
       {/* CTA Section */}
       <Section className="relative overflow-hidden">

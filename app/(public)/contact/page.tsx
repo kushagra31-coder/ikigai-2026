@@ -85,10 +85,15 @@ export default function ContactPage() {
 
           <Slide direction="up" delay={0.2}>
             <GlassCard className="h-full p-2 min-h-[400px] flex items-center justify-center relative overflow-hidden group">
-              {/* Maps Placeholder */}
-              <div className="absolute inset-0 bg-white/5 flex flex-col items-center justify-center">
-                <Icons.mapPin className="w-12 h-12 text-muted-foreground/50 mb-4" />
-                <span className="text-muted-foreground">Google Maps Placeholder</span>
+              {/* Maps Iframe */}
+              <div className="absolute inset-0 overflow-hidden rounded-xl">
+                <iframe 
+                  className="absolute inset-0 w-full h-full"
+                  style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) contrast(80%) opacity(80%)' }} // Dark mode filter
+                  loading="lazy" 
+                  allowFullScreen 
+                  src="https://maps.google.com/maps?q=Acropolis+Institute+of+Technology+and+Research,+Indore&t=&z=14&ie=UTF8&iwloc=&output=embed"
+                ></iframe>
               </div>
             </GlassCard>
           </Slide>

@@ -26,9 +26,9 @@ export default function TracksPage() {
           {PUBLIC_CONTENT.tracks.map((track, idx) => {
             const IconComp = Icons[track.icon as keyof typeof Icons] as IconType;
             return (
-              <Scale key={track.id} delay={idx * 0.1}>
-                <Hover>
-                  <GlassCard className="h-full flex flex-col group border-white/5 hover:border-primary/50">
+              <Scale key={track.id} delay={idx * 0.1} className="h-full flex flex-col">
+                <Hover className="flex-1 flex flex-col">
+                  <GlassCard className="flex-1 flex flex-col group border-black/5 hover:border-primary/50">
                     <div className="p-4 rounded-xl bg-primary/10 w-fit mb-6 group-hover:scale-110 transition-transform">
                       {IconComp && <IconComp className="w-8 h-8 text-primary" />}
                     </div>
