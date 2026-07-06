@@ -33,7 +33,7 @@ const securityHeaders = [
   },
   {
     key: 'Content-Security-Policy',
-    value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://*.supabase.co; font-src 'self'; connect-src 'self' wss://*.supabase.co https://*.supabase.co https://*.sentry.io; frame-src 'self' https://vercel.live;"
+    value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://*.supabase.co; font-src 'self'; connect-src 'self' wss://*.supabase.co https://*.supabase.co https://*.sentry.io; frame-src 'self' https://vercel.live https://www.google.com https://*.google.com https://*.openstreetmap.org;"
   }
 ];
 

@@ -38,7 +38,7 @@ export default function Home() {
           
           <Fade delay={0.2} duration="slow">
             <p className="mt-6 text-heading-l md:text-heading-xl text-primary font-bold tracking-tight">
-              <GlitchText text={PUBLIC_CONTENT.hero.tagline} delay={500} />
+              {PUBLIC_CONTENT.hero.tagline}
             </p>
           </Fade>
           

@@ -52,8 +52,8 @@ export const PUBLIC_CONTENT = {
   contact: {
     email: IKIGAI2026_CONFIG.contacts.generalSupport.email,
     phone: IKIGAI2026_CONFIG.contacts.generalSupport.phone || "TBD",
-    facultyCoords: IKIGAI2026_CONFIG.leadership.filter(l => l.designation.includes("Faculty")).map(l => l.name).join(", "),
-    studentCoords: IKIGAI2026_CONFIG.leadership.filter(l => l.designation.includes("Student")).map(l => l.name).join(", "),
+    facultyCoords: IKIGAI2026_CONFIG.leadership.filter(l => l.designation.includes("Faculty")).map(l => l.name),
+    studentCoords: IKIGAI2026_CONFIG.leadership.filter(l => l.designation.includes("Student")).map(l => l.name),
     socialLinks: {
       instagram: IKIGAI2026_CONFIG.social.instagram,
       linkedin: "#", // Add if available

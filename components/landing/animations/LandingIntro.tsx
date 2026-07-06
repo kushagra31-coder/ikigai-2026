@@ -48,15 +48,11 @@ export const LandingIntro = ({ onComplete }: { onComplete: () => void }) => {
         className="flex flex-col items-center justify-center relative"
       >
         <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full scale-150 animate-pulse" />
-        <Icons.logo className="w-24 h-24 text-white relative z-10" />
-        <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-6 text-4xl font-extrabold tracking-[0.2em] text-white relative z-10"
-        >
-          IKIGAI
-        </motion.h1>
+        <img 
+          src="/images/ikigai-logo.png" 
+          alt="IKIGAI 2026" 
+          className="h-28 w-auto object-contain relative z-10" 
+        />
       </motion.div>
     </motion.div>
   );

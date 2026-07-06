@@ -53,12 +53,20 @@ export default function ContactPage() {
                 <h3 className="text-heading-m mb-6 border-b border-white/10 pb-4">Coordinators</h3>
                 <Grid className="grid-cols-2 gap-6">
                   <div>
-                    <span className="text-sm text-accent uppercase font-bold tracking-wider mb-2 block">Faculty</span>
-                    <p className="text-muted-foreground">{PUBLIC_CONTENT.contact.facultyCoords}</p>
+                    <span className="text-sm text-secondary uppercase font-bold tracking-wider mb-2 block">Faculty</span>
+                    <ul className="text-muted-foreground space-y-1">
+                      {PUBLIC_CONTENT.contact.facultyCoords.map((name, i) => (
+                        <li key={i}>{name}</li>
+                      ))}
+                    </ul>
                   </div>
                   <div>
                     <span className="text-sm text-secondary uppercase font-bold tracking-wider mb-2 block">Students</span>
-                    <p className="text-muted-foreground">{PUBLIC_CONTENT.contact.studentCoords}</p>
+                    <ul className="text-muted-foreground space-y-1">
+                      {PUBLIC_CONTENT.contact.studentCoords.map((name, i) => (
+                        <li key={i}>{name}</li>
+                      ))}
+                    </ul>
                   </div>
                 </Grid>
               </GlassCard>
@@ -84,17 +92,15 @@ export default function ContactPage() {
           </Slide>
 
           <Slide direction="up" delay={0.2}>
-            <GlassCard className="h-full p-2 min-h-[400px] flex items-center justify-center relative overflow-hidden group">
+            <GlassCard className="p-2 min-h-[400px] overflow-hidden group">
               {/* Maps Iframe */}
-              <div className="absolute inset-0 overflow-hidden rounded-xl">
-                <iframe 
-                  className="absolute inset-0 w-full h-full"
-                  style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) contrast(80%) opacity(80%)' }} // Dark mode filter
-                  loading="lazy" 
-                  allowFullScreen 
-                  src="https://maps.google.com/maps?q=Acropolis+Institute+of+Technology+and+Research,+Indore&t=&z=14&ie=UTF8&iwloc=&output=embed"
-                ></iframe>
-              </div>
+              <iframe 
+                className="w-full h-[400px] rounded-xl"
+                style={{ border: 0 }}
+                loading="lazy" 
+                allowFullScreen 
+                src="https://www.openstreetmap.org/export/embed.html?bbox=75.924%2C22.814%2C75.952%2C22.826&amp;layer=mapnik&amp;marker=22.8218%2C75.9437"
+              ></iframe>
             </GlassCard>
           </Slide>
         </Grid>

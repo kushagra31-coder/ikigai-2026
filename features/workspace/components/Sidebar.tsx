@@ -17,11 +17,12 @@ export const Sidebar = () => {
   const SidebarContent = (
     <div className="flex flex-col h-full bg-card border-r border-white/5 shadow-2xl">
       <div className="h-16 flex items-center px-6 border-b border-white/5">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="p-1.5 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-            <Icons.logo className="w-5 h-5 text-primary" />
-          </div>
-          <span className="font-bold tracking-tight text-lg">IKIGAI 2026</span>
+        <Link href="/" className="flex items-center group">
+          <img 
+            src="/images/ikigai-logo.png" 
+            alt="IKIGAI 2026" 
+            className="h-8 w-auto object-contain transition-transform group-hover:scale-105 duration-200"
+          />
         </Link>
         <Button 
           variant="ghost" 

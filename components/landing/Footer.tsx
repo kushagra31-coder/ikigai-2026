@@ -13,13 +13,15 @@ export const Footer = () => {
 
           {/* Brand */}
           <div className="space-y-4 md:col-span-2">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Icons.logo className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <span className="font-bold text-xl tracking-tight block">IKIGAI 2026</span>
-                <span className="text-xs text-muted-foreground">CSIT-AITR Indore</span>
+            <Link href="/" className="flex items-center gap-3 group">
+              <img 
+                src="/images/ikigai-logo.png" 
+                alt="IKIGAI 2026" 
+                className="h-10 w-auto object-contain transition-transform group-hover:scale-105 duration-200"
+              />
+              <div className="border-l border-white/10 pl-3">
+                <span className="text-xs text-muted-foreground block font-bold tracking-wider">CSIT-AITR</span>
+                <span className="text-[10px] text-muted-foreground/60 block">INDORE</span>
               </div>
             </Link>
             <p className="text-muted-foreground max-w-sm text-sm leading-relaxed">

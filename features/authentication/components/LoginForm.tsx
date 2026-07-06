@@ -37,9 +37,14 @@ export const LoginForm = () => {
 
   return (
     <div className="w-full max-w-md mx-auto space-y-6">
-      <div className="space-y-2 text-center">
+      <div className="flex flex-col items-center text-center space-y-3">
+        <img 
+          src="/images/ikigai-logo.png" 
+          alt="IKIGAI 2026" 
+          className="h-14 w-auto object-contain mb-2 animate-fade-in" 
+        />
         <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
-        <p className="text-muted-foreground">Sign in to your IKIGAI 2026 account</p>
+        <p className="text-muted-foreground">Sign in to your account</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">

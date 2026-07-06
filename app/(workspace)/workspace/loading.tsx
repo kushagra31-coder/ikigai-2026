@@ -14,7 +14,11 @@ export default function WorkspaceLoading() {
       >
         <div className="relative">
           <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-150 animate-pulse" />
-          <Icons.logo className="w-16 h-16 text-primary relative z-10 animate-bounce" />
+          <img 
+            src="/images/ikigai-logo.png" 
+            alt="IKIGAI 2026" 
+            className="h-16 w-auto object-contain relative z-10 animate-bounce" 
+          />
         </div>
         <h2 className="mt-8 text-xl font-bold tracking-widest uppercase">Loading Workspace</h2>
         

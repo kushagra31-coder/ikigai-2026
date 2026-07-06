@@ -65,11 +65,12 @@ export const Navbar = () => {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-              <Icons.logo className="w-6 h-6 text-primary" />
-            </div>
-            <span className="font-bold text-xl tracking-tight">{IKIGAI2026_CONFIG.branding.eventName.split(' ')[0]}</span>
+          <Link href="/" className="flex items-center group">
+            <img 
+              src="/images/ikigai-logo.png" 
+              alt="IKIGAI 2026" 
+              className="h-10 w-auto object-contain transition-transform group-hover:scale-105 duration-200"
+            />
           </Link>
 
           {/* Desktop Nav */}
