@@ -13,14 +13,21 @@ import { CommandMenu } from './CommandMenu';
 import { useEffect } from 'react';
 
 export const WorkspaceLayout = ({ children }: { children: ReactNode }) => {
-  const { loading, authenticated } = useAuthContext();
+  const { loading, authenticated, role } = useAuthContext();
   const router = useRouter();
 
   useEffect(() => {
     if (!loading && !authenticated) {
       router.push('/login');
+    } else if (!loading && authenticated && role !== 'MENTOR' && role !== 'ADMIN') {
+      // Force logout for non-whitelisted users and redirect to login with error
+      import('@/features/authentication/services/auth.service').then(({ AuthService }) => {
+        AuthService.signOut().then(() => {
+          window.location.href = '/login?error=not_whitelisted';
+        });
+      });
     }
-  }, [loading, authenticated, router]);
+  }, [loading, authenticated, role, router]);
 
   if (loading || !authenticated) {
     return <LoadingScreen />;

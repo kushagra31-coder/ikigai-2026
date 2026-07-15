@@ -182,14 +182,36 @@ export default function Home() {
       <Section id="sponsors" className="relative">
         <Container>
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <h2 className="text-heading-xl md:text-[4rem] font-black leading-tight">Organizing Team</h2>
+            <p className="text-body-l text-muted-foreground">
+              The driving force behind IKIGAI 2026.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 mb-12 max-w-5xl mx-auto">
+            {PUBLIC_CONTENT.sponsors.filter(s => s.tier === 'Organized By').map((sponsor) => (
+              <SponsorCard
+                key={sponsor.id}
+                id={sponsor.id}
+                name={sponsor.name}
+                logo={sponsor.logo}
+                tier={sponsor.tier}
+                website={sponsor.website}
+              />
+            ))}
+          </div>
+
+          <div className="py-24" /> {/* Spacer */}
+
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
             <h2 className="text-heading-xl md:text-[4rem] font-black leading-tight">Our Sponsors</h2>
             <p className="text-body-l text-muted-foreground">
               IKIGAI 2026 is made possible by our generous partners and sponsors.
             </p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {PUBLIC_CONTENT.sponsors.map((sponsor) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 md:gap-10 max-w-6xl mx-auto">
+            {PUBLIC_CONTENT.sponsors.filter(s => s.tier !== 'Organized By').map((sponsor) => (
               <SponsorCard
                 key={sponsor.id}
                 id={sponsor.id}

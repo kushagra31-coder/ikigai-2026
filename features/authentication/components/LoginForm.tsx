@@ -6,11 +6,13 @@ import { Button } from '@/components/primitives/button';
 import { Input } from '@/components/primitives/input';
 import { Label } from '@/components/primitives/label';
 import { GoogleButton } from './GoogleButton';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export const LoginForm = () => {
   const { signInWithEmail } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isNotWhitelisted = searchParams?.get('error') === 'not_whitelisted';
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -46,6 +48,12 @@ export const LoginForm = () => {
         <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
         <p className="text-muted-foreground">Sign in to your account</p>
       </div>
+
+      {isNotWhitelisted && (
+        <div className="p-4 text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-xl text-center">
+          <strong>Access Denied:</strong> Your email is not whitelisted for access. Only authorized Mentors and Admins can log in.
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">

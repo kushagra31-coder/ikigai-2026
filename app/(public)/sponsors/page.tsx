@@ -20,19 +20,19 @@ function SponsorCard({ sponsor, idx }: { sponsor: any; idx: number }) {
           rel="noreferrer"
           className="block h-full"
         >
-          <GlassCard className="h-full flex flex-col items-center justify-center text-center group border-white/5 hover:border-primary/50 p-6 min-h-[200px] relative overflow-hidden">
-            <span className="absolute top-2 right-2 text-[9px] font-bold uppercase tracking-wider text-primary/60">
+          <GlassCard className="h-full flex flex-col items-center justify-center text-center group border-none !bg-transparent hover:!bg-white/5 p-8 min-h-[200px] relative overflow-hidden transition-colors">
+            <span className="absolute top-4 right-4 text-[9px] font-bold uppercase tracking-wider text-primary/60">
               {sponsor.category}
             </span>
 
             <div className="w-full flex items-center justify-center mb-4">
-              <div className="relative bg-white rounded-xl p-3 w-36 h-20 flex items-center justify-center shadow-md group-hover:shadow-primary/20 group-hover:shadow-lg transition-shadow duration-300">
+              <div className="relative w-32 h-20 flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
               {!imgError ? (
                 <Image
                   src={sponsor.logo}
                   alt={`${sponsor.name} Logo`}
                   fill
-                  className="object-contain p-2 transition-all duration-300 group-hover:scale-105"
+                  className="object-contain filter invert opacity-90 transition-all duration-300 group-hover:scale-110 group-hover:opacity-100"
                   sizes="(max-width: 768px) 50vw, 20vw"
                   loading="lazy"
                   onError={() => setImgError(true)}
@@ -61,7 +61,11 @@ function SponsorCard({ sponsor, idx }: { sponsor: any; idx: number }) {
 export default function SponsorsPage() {
   const sponsors = IKIGAI2026_CONFIG.sponsors;
 
-  const grouped = sponsors.reduce((acc: any, s: any) => {
+  // Separate into organizing team and other sponsors
+  const organizingTeam = sponsors.filter((s: any) => s.category === 'Organized By');
+  const otherSponsors = sponsors.filter((s: any) => s.category !== 'Organized By');
+
+  const grouped = otherSponsors.reduce((acc: any, s: any) => {
     if (!acc[s.category]) acc[s.category] = [];
     acc[s.category].push(s);
     return acc;
@@ -70,6 +74,25 @@ export default function SponsorsPage() {
   return (
     <Section className="pt-32 min-h-screen">
       <Container>
+        <Fade>
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <h1 className="text-display font-bold">Organizing Team</h1>
+            <p className="text-body-l text-muted-foreground">
+              The driving force behind IKIGAI 2026.
+            </p>
+          </div>
+        </Fade>
+
+        <div className="mb-12">
+          <Grid className="grid-cols-2 sm:grid-cols-3 gap-8 md:gap-12 max-w-5xl mx-auto">
+            {organizingTeam.map((sponsor: any, idx: number) => (
+              <SponsorCard key={sponsor.name} sponsor={sponsor} idx={idx} />
+            ))}
+          </Grid>
+        </div>
+
+        <div className="py-24" /> {/* Spacer */}
+
         <Fade>
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
             <h1 className="text-display font-bold">Our Partners & Sponsors</h1>
@@ -87,7 +110,7 @@ export default function SponsorsPage() {
                   {category}
                 </h2>
               </Fade>
-              <Grid className="grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              <Grid className="grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 md:gap-10">
                 {items.map((sponsor: any, idx: number) => (
                   <SponsorCard key={sponsor.name} sponsor={sponsor} idx={idx} />
                 ))}

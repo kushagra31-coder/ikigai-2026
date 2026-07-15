@@ -24,7 +24,7 @@ export function EventStatusCard({ status }: { status: string }) {
     <GlassCard className="p-6 border-primary/20 bg-primary/5 flex items-center justify-between">
       <div>
         <h2 className="text-lg font-semibold text-muted-foreground">Global Event Status</h2>
-        <div className="text-2xl font-bold mt-1 text-primary">{status.replace('_', ' ')}</div>
+        <div className="text-2xl font-bold mt-1 text-primary">{(status || 'NOT SET').replace('_', ' ')}</div>
       </div>
       <Icons.settings className="w-12 h-12 text-primary opacity-20" />
     </GlassCard>

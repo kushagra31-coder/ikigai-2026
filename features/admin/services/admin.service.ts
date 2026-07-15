@@ -17,6 +17,7 @@ export class AdminService {
   static async bulkLockUnlock(teamIds: string[], isLocked: boolean) { await delay(200); return unwrap(await adminRepository.teams.bulkLockUnlock(teamIds, isLocked)); }
   
   static async getMentors() { await delay(200); return unwrap(await adminRepository.mentors.getMentors()); }
+  static async assignMentorTrack(mentorId: string, trackId: string) { await delay(200); return unwrap(await adminRepository.mentors.assignTrack(mentorId, trackId)); }
   
   static async getTracks() { await delay(200); return unwrap(await adminRepository.tracks.getTracks()); }
   

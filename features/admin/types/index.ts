@@ -38,8 +38,11 @@ export interface Track {
 export interface AdminMentor {
   id: string;
   name: string;
+  email: string;
   department: string;
   availability: 'ONLINE' | 'BUSY' | 'OFFLINE';
+  trackId?: string;
+  trackName?: string;
   assignedTeams: number;
   assignedSessions: number;
   currentLoad: number; // percentage
@@ -88,7 +91,6 @@ export interface AdminTeam {
   id: string;
   name: string;
   trackId?: string;
-  mentorId?: string;
   membersCount: number;
   submissionStatus: 'NOT_STARTED' | 'DRAFT' | 'SUBMITTED';
   isLocked: boolean;

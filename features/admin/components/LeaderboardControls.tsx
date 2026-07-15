@@ -1,59 +1,79 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { GlassCard } from '@/components/data-display/GlassCard';
 import { Button } from '@/components/primitives/button';
+import { createClient as supabase } from '@/lib/supabase/client';
+import { Icons } from '@/components/constants/icons';
 
 export function LeaderboardControls() {
+  const [mode, setMode] = useState<'hidden' | 'live' | 'final'>('hidden');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    const { data } = await supabase().from('settings').select('value').eq('id', 'leaderboard').single();
+    if (data?.value?.mode) {
+      setMode(data.value.mode);
+    }
+    setLoading(false);
+  };
+
+  const updateMode = async (newMode: 'hidden' | 'live' | 'final') => {
+    setLoading(true);
+    await supabase().from('settings').upsert({ id: 'leaderboard', value: { mode: newMode } });
+    setMode(newMode);
+    setLoading(false);
+    alert(`Leaderboard mode updated to: ${newMode}`);
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <ControlCard 
         title="Publish Leaderboard" 
         description="Make the leaderboard visible to all participants on the public routes."
-        actionLabel="Publish to Public"
-        actionVariant="success"
+        actionLabel={mode === 'live' ? 'Currently Live' : 'Publish to Public'}
+        actionVariant={mode === 'live' ? 'success' : 'outline'}
+        onClick={() => updateMode('live')}
+        disabled={loading || mode === 'live'}
+        icon={mode === 'live' ? <Icons.check className="w-4 h-4 mr-2" /> : null}
       />
       <ControlCard 
         title="Hide Leaderboard" 
         description="Instantly revoke public access to the leaderboard."
-        actionLabel="Hide Leaderboard"
-        actionVariant="danger"
+        actionLabel={mode === 'hidden' ? 'Currently Hidden' : 'Hide Leaderboard'}
+        actionVariant={mode === 'hidden' ? 'danger' : 'outline'}
+        onClick={() => updateMode('hidden')}
+        disabled={loading || mode === 'hidden'}
+        icon={mode === 'hidden' ? <Icons.eyeOff className="w-4 h-4 mr-2" /> : null}
       />
       <ControlCard 
-        title="Freeze Scores" 
-        description="Stop realtime score updates from incoming evaluations."
-        actionLabel="Freeze Realtime"
-        actionVariant="outline"
-      />
-      <ControlCard 
-        title="Reset Standings" 
-        description="Clear all accumulated points. This cannot be undone."
-        actionLabel="Reset Everything"
-        actionVariant="destructive"
-      />
-      <ControlCard 
-        title="Export CSV" 
-        description="Download a full audit trail of all final team scores."
-        actionLabel="Download CSV"
-        actionVariant="primary"
-      />
-      <ControlCard 
-        title="Live Preview" 
-        description="View the leaderboard exactly as participants see it."
-        actionLabel="Open Preview"
-        actionVariant="outline"
+        title="Finalize Standings" 
+        description="Mark leaderboard as final and show trophies."
+        actionLabel={mode === 'final' ? 'Currently Final' : 'Set as Final'}
+        actionVariant={mode === 'final' ? 'primary' : 'outline'}
+        onClick={() => updateMode('final')}
+        disabled={loading || mode === 'final'}
+        icon={mode === 'final' ? <Icons.trophy className="w-4 h-4 mr-2" /> : null}
       />
     </div>
   );
 }
 
-function ControlCard({ title, description, actionLabel, actionVariant }: { title: string, description: string, actionLabel: string, actionVariant: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "primary" | "success" | "danger" | null | undefined }) {
+function ControlCard({ title, description, actionLabel, actionVariant, onClick, disabled, icon }: any) {
   return (
     <GlassCard className="p-6 flex flex-col justify-between gap-4">
       <div>
         <h3 className="font-semibold text-lg">{title}</h3>
         <p className="text-sm text-muted-foreground mt-1">{description}</p>
       </div>
-      <Button variant={actionVariant} className="w-full">{actionLabel}</Button>
+      <Button variant={actionVariant} className="w-full" onClick={onClick} disabled={disabled}>
+        {icon}
+        {actionLabel}
+      </Button>
     </GlassCard>
   );
 }

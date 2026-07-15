@@ -54,6 +54,48 @@ export const WORKSPACE_NAV: NavItem[] = [
     roles: ['ADMIN'],
   },
   {
+    title: 'Evaluations Monitor',
+    href: '/workspace/admin/evaluations',
+    icon: 'star',
+    roles: ['ADMIN'],
+  },
+  {
+    title: 'Manage Teams',
+    href: '/workspace/admin/teams',
+    icon: 'users',
+    roles: ['ADMIN'],
+  },
+  {
+    title: 'Manage Tracks',
+    href: '/workspace/admin/tracks',
+    icon: 'filter',
+    roles: ['ADMIN'],
+  },
+  {
+    title: 'Manage Mentors',
+    href: '/workspace/admin/mentors',
+    icon: 'users',
+    roles: ['ADMIN'],
+  },
+  {
+    title: 'Push Announcements',
+    href: '/workspace/admin/announcements',
+    icon: 'bell',
+    roles: ['ADMIN'],
+  },
+  {
+    title: 'Leaderboard Ops',
+    href: '/workspace/admin/leaderboard',
+    icon: 'trophy',
+    roles: ['ADMIN'],
+  },
+  {
+    title: 'Judge Panel',
+    href: '/workspace/judge',
+    icon: 'fileText',
+    roles: ['MENTOR'],
+  },
+  {
     title: 'Settings',
     href: '/workspace/settings',
     icon: 'settings',

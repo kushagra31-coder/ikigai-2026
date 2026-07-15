@@ -16,9 +16,8 @@ interface SponsorCardProps {
 export function SponsorCard({ name, logo, tier, website }: SponsorCardProps) {
   const [imgError, setImgError] = useState(false);
   const initials = name.substring(0, 2).toUpperCase();
-
   const content = (
-    <div className="p-4 flex flex-col items-center justify-center min-h-[160px] group relative transition-transform hover:scale-105">
+    <div className="p-6 flex flex-col items-center justify-center min-h-[180px] group relative transition-all duration-300 hover:bg-white/5 rounded-2xl">
       <div className="relative w-[80%] h-24 mb-4 flex items-center justify-center">
         {!imgError ? (
             <Image

@@ -8,6 +8,7 @@ import { Button } from '@/components/primitives/button';
 import { Icons } from '@/components/constants/icons';
 import { AuthService } from '@/features/authentication/services/auth.service';
 import IKIGAI2026_CONFIG from '@/config/event.config';
+import { NotificationBell } from './NotificationBell';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -42,6 +43,7 @@ export const Navbar = () => {
   const links = [
     { name: 'About', href: '/about' },
     { name: 'Tracks', href: '/tracks' },
+    { name: 'Leaderboard', href: '/leaderboard' },
     { name: 'Timeline', href: '/timeline' },
     { name: 'Sponsors', href: '/sponsors' },
     { name: 'Leadership', href: '/leadership' },
@@ -91,9 +93,17 @@ export const Navbar = () => {
             
             <div className="flex items-center gap-4 border-l border-white/10 pl-8">
               {isAuthenticated ? (
-                <Button asChild variant="primary">
-                  <Link href="/workspace">Dashboard</Link>
-                </Button>
+                <>
+                  <Button asChild variant="primary">
+                    <Link href="/workspace">Dashboard</Link>
+                  </Button>
+                  <Button variant="ghost" onClick={async () => {
+                    await AuthService.signOut();
+                    window.location.reload();
+                  }}>
+                    Logout
+                  </Button>
+                </>
               ) : (
                 <>
                   <Button asChild variant="ghost">
@@ -104,16 +114,20 @@ export const Navbar = () => {
                   </Button>
                 </>
               )}
+              <NotificationBell />
             </div>
           </div>
 
           {/* Mobile Toggle */}
-          <button 
-            className="md:hidden p-2 text-foreground"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <Icons.close className="w-6 h-6" /> : <Icons.menu className="w-6 h-6" />}
-          </button>
+          <div className="md:hidden flex items-center gap-4">
+            <NotificationBell />
+            <button 
+              className="p-2 text-foreground"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <Icons.close className="w-6 h-6" /> : <Icons.menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
       </motion.nav>
 
@@ -137,9 +151,17 @@ export const Navbar = () => {
             <div className="h-px bg-white/10 my-4" />
             
             {isAuthenticated ? (
-              <Button asChild variant="primary" size="lg" className="w-full justify-center">
-                <Link href="/workspace">Go to Dashboard</Link>
-              </Button>
+              <div className="flex flex-col gap-4">
+                <Button asChild variant="primary" size="lg" className="w-full justify-center">
+                  <Link href="/workspace">Go to Dashboard</Link>
+                </Button>
+                <Button variant="outline" size="lg" className="w-full justify-center" onClick={async () => {
+                  await AuthService.signOut();
+                  window.location.reload();
+                }}>
+                  Logout
+                </Button>
+              </div>
             ) : (
               <div className="flex flex-col gap-4">
                 <Button asChild variant="outline" size="lg" className="w-full justify-center">

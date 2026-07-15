@@ -4,6 +4,7 @@ import { useAdminDashboard } from '@/features/admin/hooks/useAdminDashboard';
 import { useAdminSettings } from '@/features/admin/hooks/useAdminSettings';
 import { StatCard, EventStatusCard } from '@/features/admin/components/CoreCards';
 import { AdminQuickActions } from '@/features/admin/components/AdminQuickActions';
+import { LeaderboardAdminControls } from '@/features/admin/components/LeaderboardAdminControls';
 import { Icons } from '@/components/constants/icons';
 
 export default function AdminPage() {
@@ -21,6 +22,11 @@ export default function AdminPage() {
         <StatCard label="Total Mentors" value={stats.totalMentors} icon={Icons.users} color="text-green-400" />
         <StatCard label="Total Tracks" value={stats.totalTracks} icon={Icons.settings} color="text-yellow-400" />
         <StatCard label="Active Sessions" value={stats.activeSessions} icon={Icons.clock} color="text-purple-400" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <LeaderboardAdminControls />
+        {/* Placeholder for other admin controls */}
       </div>
 
       <AdminQuickActions />

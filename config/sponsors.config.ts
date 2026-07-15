@@ -32,7 +32,7 @@ export const SPONSORS_CONFIG = [
     shortName: "AWaDH",
     logo: "/images/sponsors/awadh.png",
     website: "https://awadh.iitrpr.ac.in",
-    category: "Knowledge Partner",
+    category: "Sponsor",
     priority: 4,
     color: "#0891b2"
   },
@@ -41,7 +41,7 @@ export const SPONSORS_CONFIG = [
     shortName: "IEEE TEMS",
     logo: "/images/sponsors/ieee-tems.png",
     website: "https://ieee.org",
-    category: "Supported By",
+    category: "Sponsor",
     priority: 5,
     color: "#0284c7"
   },
@@ -50,7 +50,7 @@ export const SPONSORS_CONFIG = [
     shortName: "IEEE SB",
     logo: "/images/sponsors/ieee-sb.png",
     website: "https://ieee.org",
-    category: "Supported By",
+    category: "Sponsor",
     priority: 6,
     color: "#0284c7"
   },
@@ -59,7 +59,7 @@ export const SPONSORS_CONFIG = [
     shortName: "TCS",
     logo: "/images/sponsors/tcs.png",
     website: "https://tcs.com",
-    category: "Technology Partner",
+    category: "Sponsor",
     priority: 7,
     color: "#0f172a"
   },
@@ -68,7 +68,7 @@ export const SPONSORS_CONFIG = [
     shortName: "Unstop",
     logo: "/images/sponsors/unstop.png",
     website: "https://unstop.com",
-    category: "Platform Partner",
+    category: "Sponsor",
     priority: 8,
     color: "#6d28d9"
   },
@@ -77,7 +77,7 @@ export const SPONSORS_CONFIG = [
     shortName: "Clay",
     logo: "/images/sponsors/claygrounds.png",
     website: "https://claygrounds.in",
-    category: "Community Partner",
+    category: "Sponsor",
     priority: 9,
     color: "#b45309"
   },
@@ -86,7 +86,7 @@ export const SPONSORS_CONFIG = [
     shortName: "SA",
     logo: "/images/sponsors/sportsalgo.png",
     website: "https://sportsalgo.in",
-    category: "Associate Partner",
+    category: "Sponsor",
     priority: 10,
     color: "#15803d"
   }
