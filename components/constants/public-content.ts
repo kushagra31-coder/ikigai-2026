@@ -62,10 +62,10 @@ export const PUBLIC_CONTENT = {
     }
   },
   footer: {
-    copyright: `© 2026 ${IKIGAI2026_CONFIG.branding.eventName}. Made with ❤️`,
+    copyright: `© 2026 ${IKIGAI2026_CONFIG.branding.eventName}. All systems operational.`,
     links: [
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms of Service", href: "/terms" }
+      { label: "Rulebook", href: "/rulebook" },
+      { label: "Contact Operations", href: "/contact" }
     ]
   }
 };

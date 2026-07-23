@@ -30,7 +30,7 @@ export const Countdown = ({ targetDate }: { targetDate: string }) => {
     <Fade delay={0.4}>
       <div className="flex gap-2 md:gap-4 justify-center mt-12">
         {Object.entries(timeLeft).map(([label, value]) => (
-          <GlassCard key={label} className="p-3 md:p-6 min-w-[70px] md:min-w-[120px] text-center flex flex-col items-center shadow-none hover:shadow-glow-purple">
+          <GlassCard key={label} className="p-3 md:p-6 min-w-[70px] md:min-w-[120px] text-center flex flex-col items-center shadow-sm hover:bg-white/5 transition-colors">
             <span className="text-3xl md:text-5xl font-bold font-mono text-primary tracking-tighter">
               {String(value).padStart(2, '0')}
             </span>

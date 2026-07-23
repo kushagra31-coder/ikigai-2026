@@ -22,7 +22,7 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export function PushNotificationManager() {
-  const [isSupported, setIsSupported] = useState(false);
+  const [isSupported, setIsSupported] = useState<boolean>(false);
   const [subscription, setSubscription] = useState<PushSubscription | null>(null);
   const [loading, setLoading] = useState(false);
   const supabase = createBrowserClient(
@@ -31,25 +31,30 @@ export function PushNotificationManager() {
   );
 
   useEffect(() => {
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-      setIsSupported(true);
+    let supported = false;
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window) {
+      supported = true;
+    }
+    setIsSupported(supported);
+
+    async function registerServiceWorker() {
+      try {
+        const registration = await navigator.serviceWorker.register('/sw.js', {
+          scope: '/',
+          updateViaCache: 'none',
+        });
+        
+        const sub = await registration.pushManager.getSubscription();
+        setSubscription(sub);
+      } catch (error) {
+        console.error('Service Worker registration failed:', error);
+      }
+    }
+
+    if (supported) {
       registerServiceWorker();
     }
   }, []);
-
-  async function registerServiceWorker() {
-    try {
-      const registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/',
-        updateViaCache: 'none',
-      });
-      
-      const sub = await registration.pushManager.getSubscription();
-      setSubscription(sub);
-    } catch (error) {
-      console.error('Service Worker registration failed:', error);
-    }
-  }
 
   async function subscribeToPush() {
     setLoading(true);
@@ -116,7 +121,7 @@ export function PushNotificationManager() {
 
   if (subscription) {
     return (
-      <Button variant="outline" size="sm" onClick={unsubscribeFromPush} disabled={loading} className="w-full justify-start text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10">
+      <Button variant="outline" size="sm" onClick={unsubscribeFromPush} disabled={loading} className="w-full justify-start text-success hover:text-success hover:bg-success/10">
         <Bell className="w-4 h-4 mr-2" />
         Notifications Enabled
       </Button>

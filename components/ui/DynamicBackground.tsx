@@ -8,14 +8,14 @@ export default function DynamicBackground() {
   const pathname = usePathname();
 
   // Determine color palette based on route
-  let gradientFrom = "#10b981"; // Default Emerald
-  let gradientTo = "#06b6d4"; // Default Cyan
-  let glowColor = "rgba(16, 185, 129, 0.3)";
+  let gradientFrom = "#9333ea"; // Brand Purple
+  let gradientTo = "#06b6d4"; // Brand Cyan
+  let glowColor = "rgba(147, 51, 234, 0.25)";
   
   // Variables for UI elements to sync
-  let glowPrimary = "rgba(16, 185, 129, 0.5)"; // Used for drop shadows
+  let glowPrimary = "rgba(147, 51, 234, 0.5)"; // Used for drop shadows
   let glowSecondary = "rgba(6, 182, 212, 0.6)"; // Used for buttons
-  let glowRgba = "rgba(16, 185, 129, 0.15)"; // Used for GlassCard spotlights
+  let glowRgba = "rgba(147, 51, 234, 0.12)"; // Used for GlassCard spotlights
 
   if (pathname.startsWith('/login') || pathname.startsWith('/register') || pathname.startsWith('/auth')) {
     // Auth Pages: Deep Purple & Hot Pink

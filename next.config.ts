@@ -47,25 +47,27 @@ const nextConfig: NextConfig = {
         source: '/(.*)',
         headers: securityHeaders,
       },
-      {
-        // Cache static assets (images, fonts, css, js) aggressively
-        source: '/_next/static/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          }
-        ],
-      },
-      {
-        source: '/(.*).(woff|woff2|png|jpg|jpeg|gif|ico|svg|avif|webp)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          }
-        ],
-      }
+      ... (process.env.NODE_ENV === 'production' ? [
+        {
+          // Cache static assets (images, fonts, css, js) aggressively
+          source: '/_next/static/(.*)',
+          headers: [
+            {
+              key: 'Cache-Control',
+              value: 'public, max-age=31536000, immutable',
+            }
+          ],
+        },
+        {
+          source: '/(.*).(woff|woff2|png|jpg|jpeg|gif|ico|svg|avif|webp)',
+          headers: [
+            {
+              key: 'Cache-Control',
+              value: 'public, max-age=31536000, immutable',
+            }
+          ],
+        }
+      ] : [])
     ];
   },
   images: {

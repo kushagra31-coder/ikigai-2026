@@ -1,173 +1,152 @@
 'use client';
 
-// Remove Metadata import as this is now a client component
-import { GlassCard } from '@/components/data-display/GlassCard';
+import Link from 'next/link';
 import { Icons } from '@/components/constants/icons';
 import { Badge } from '@/components/primitives/badge';
-import Link from 'next/link';
-
-
-
+import { Button } from '@/components/primitives/button';
 import { useAuthContext } from '@/components/providers/AuthProvider';
+import { useState, useEffect } from 'react';
 
 export default function DashboardPage() {
-  const { role } = useAuthContext();
-  
+  const { role, profile } = useAuthContext();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate initial load for loading state demonstration
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
-            Welcome back, {role === 'ADMIN' ? 'Admin' : 'Mentor'}.
+    <div className="flex flex-col max-w-6xl mx-auto w-full pb-16 pt-8 px-4 md:px-0">
+      {/* Top Header / Command Area */}
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+        <div className="flex flex-col gap-1">
+          <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 flex items-center gap-2 w-fit mb-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            <span className="font-mono text-[9px] uppercase tracking-widest">Live: Judging Phase</span>
+          </Badge>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+            {profile?.full_name?.split(' ')[0] || (role === 'ADMIN' ? 'Admin Workspace' : 'Judge Workspace')}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {role === 'ADMIN' ? 'Manage event operations and teams.' : 'Your pending evaluations and schedule.'}
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 flex items-center gap-2 py-1.5 px-3">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Live Session
-          </Badge>
-          <div className="text-sm font-mono bg-card border border-white/10 px-4 py-1.5 rounded-full">
-            24:15:30 left
+        
+        <div className="flex w-full md:w-auto items-center gap-3">
+          {/* Command Palette Trigger */}
+          <button 
+            onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
+            className="flex items-center justify-between w-full sm:w-64 px-4 py-2 bg-muted/20 border border-border rounded-lg text-sm text-muted-foreground hover:bg-muted/40 transition-colors focus:outline-none focus:ring-1 focus:ring-primary/50"
+          >
+            <div className="flex items-center gap-2">
+              <Icons.search className="w-4 h-4" />
+              <span>Search platform...</span>
+            </div>
+            <kbd className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] bg-background px-1.5 py-0.5 rounded border border-border">
+              <span>Ctrl</span>K
+            </kbd>
+          </button>
+        </div>
+      </header>
+
+      {isLoading ? (
+        <div className="animate-pulse space-y-8">
+          <div className="h-32 bg-muted/20 rounded-xl border border-border" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="col-span-2 h-64 bg-muted/20 rounded-xl border border-border" />
+            <div className="col-span-1 h-64 bg-muted/20 rounded-xl border border-border" />
           </div>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Welcome & Quick Action Card */}
-        <GlassCard className="lg:col-span-2 flex flex-col justify-between overflow-hidden relative">
-          <div className="absolute right-0 top-0 w-64 h-64 bg-primary/20 blur-[100px] rounded-full pointer-events-none translate-x-1/3 -translate-y-1/3" />
-          
-          <div className="relative z-10 flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold">Hello! 👋</h2>
-              <p className="text-muted-foreground mt-2 max-w-md text-sm leading-relaxed">
-                Thank you for taking the time to evaluate our teams. Your feedback is crucial for their growth. 
-                Ready to start judging?
-              </p>
-            </div>
-            <div className="flex flex-col items-center shrink-0 w-full md:w-auto bg-black/20 p-4 rounded-xl border border-white/5">
-              <span className="text-xs text-muted-foreground mb-4 font-medium uppercase tracking-wider">Quick Action</span>
-              <Link 
-                href="/workspace/judge" 
-                className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
-              >
-                <Icons.fileText className="w-5 h-5" />
-                Go to Judge Panel
-              </Link>
-            </div>
-          </div>
-        </GlassCard>
-
-        {/* Current Session */}
-        <GlassCard className="flex flex-col">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-accent/20 rounded-lg text-accent">
-              <Icons.clock className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-lg">Current Phase</h3>
-          </div>
-          <div className="flex-1 flex flex-col justify-center">
-            <h4 className="text-xl font-bold text-accent">Judging Phase</h4>
-            <p className="text-sm text-muted-foreground mt-2">
-              Teams have submitted their projects. Please review their MVPs and provide constructive feedback.
-            </p>
-            <div className="mt-6 flex items-center justify-between text-xs font-medium border-t border-white/10 pt-4">
-              <span className="text-muted-foreground">Next Phase:</span>
-              <span className="text-foreground">Final Results</span>
-            </div>
-          </div>
-        </GlassCard>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <QuickActionCard 
-          icon={<Icons.fileText className="w-5 h-5 text-primary" />}
-          title="Judge Panel"
-          desc="Evaluate teams"
-          href="/workspace/judge"
-        />
-        <QuickActionCard 
-          icon={<Icons.star className="w-5 h-5 text-success" />}
-          title="Leaderboard"
-          desc="View live rankings"
-          href="/leaderboard"
-        />
-        <QuickActionCard 
-          icon={<Icons.users className="w-5 h-5 text-accent" />}
-          title="Profile"
-          desc="Manage details"
-          href="/workspace/profile"
-        />
-        <QuickActionCard 
-          icon={<Icons.bell className="w-5 h-5 text-warning" />}
-          title="Announcements"
-          desc="Important updates"
-          href="/workspace/announcements"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 flex flex-col gap-6">
-          <GlassCard>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold flex items-center gap-2">
-                <Icons.check className="w-4 h-4 text-primary" /> Judging Progress
-              </h3>
-            </div>
-            <p className="text-sm text-muted-foreground mb-4">
-              Access the Judge Panel to see exactly which teams have been assigned to you.
-            </p>
-            <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-              <div 
-                className="bg-primary h-full rounded-full transition-all duration-1000 w-1/4" 
-              />
-            </div>
-          </GlassCard>
-        </div>
-
-        {/* Announcements Preview */}
-        <GlassCard className="flex flex-col h-full">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-semibold flex items-center gap-2">
-              <Icons.bell className="w-4 h-4 text-warning" /> Announcements
-            </h3>
-            <Link href="/workspace/announcements" className="text-xs text-muted-foreground hover:text-primary">View all</Link>
-          </div>
-          
-          <div className="flex flex-col gap-4 flex-1">
-            <div className="flex gap-4 p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors group cursor-pointer">
-              <div className="mt-1 shrink-0">
-                <div className="w-2 h-2 rounded-full bg-primary mt-1.5" />
+      ) : (
+        <div className="flex flex-col gap-12">
+          {/* Primary Action / Progress Header */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-px bg-border border border-border rounded-xl overflow-hidden shadow-sm">
+            <div className="col-span-1 md:col-span-3 bg-background p-6 md:p-8 flex flex-col justify-center">
+              <div className="flex items-center gap-2 mb-4">
+                <Icons.fileText className="w-4 h-4 text-primary" />
+                <span className="text-xs font-mono font-semibold uppercase tracking-widest text-muted-foreground">Evaluation Required</span>
               </div>
+              <h2 className="text-xl font-semibold tracking-tight text-foreground mb-2">0 teams await your review</h2>
+              <p className="text-sm text-muted-foreground mb-6 max-w-lg">
+                Your queue is currently empty. The system will notify you when new submissions are assigned to your panel.
+              </p>
               <div>
-                <h4 className="text-sm font-medium group-hover:text-primary transition-colors">
-                  Judging is Live!
-                </h4>
-                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                  Please make sure to submit your feedback before the deadline.
+                <Button disabled asChild size="default" className="h-10 px-6 shadow-sm transition-transform hover:scale-[0.98] opacity-50 cursor-not-allowed">
+                  <span>Start Evaluations</span>
+                </Button>
+              </div>
+            </div>
+            
+            <div className="col-span-1 bg-muted/10 p-6 md:p-8 flex flex-col justify-center border-l border-border">
+              <div className="text-xs text-muted-foreground uppercase tracking-widest font-mono mb-2">Your Progress</div>
+              <div className="flex items-baseline gap-1 mb-4">
+                <span className="text-4xl font-semibold tracking-tight text-foreground">0</span>
+                <span className="text-sm text-muted-foreground font-mono">/ 0</span>
+              </div>
+              <div className="w-full bg-border h-2 rounded-full overflow-hidden mb-6">
+                <div className="bg-primary h-full rounded-full transition-all w-[0%]" />
+              </div>
+              <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono opacity-50">Deadline: Pending</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+            {/* Task List / Queue */}
+            <div className="lg:col-span-8 flex flex-col gap-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-semibold tracking-tight text-foreground">Priority Queue</h3>
+                <Link href="/workspace/judge" className="text-xs font-medium text-primary hover:underline">View All</Link>
+              </div>
+              
+              <div className="flex flex-col border border-border rounded-xl overflow-hidden bg-muted/5 shadow-sm min-h-[300px] items-center justify-center p-8 text-center">
+                <Icons.inbox className="w-8 h-8 text-muted-foreground mb-4 opacity-50" />
+                <h4 className="text-base font-semibold text-foreground tracking-tight mb-2">Queue Empty</h4>
+                <p className="text-sm text-muted-foreground max-w-sm">
+                  You have no pending evaluations. Submissions will appear here once assigned to you.
                 </p>
               </div>
             </div>
+
+            {/* Sidebar Area */}
+            <div className="lg:col-span-4 flex flex-col gap-10">
+              {/* Quick Links */}
+              <div className="flex flex-col gap-3">
+                <h3 className="text-sm font-semibold text-foreground tracking-tight">Quick Links</h3>
+                <div className="flex flex-col gap-2">
+                  <SidebarLink icon={<Icons.trophy className="w-4 h-4" />} title="Live Leaderboard" href="/leaderboard" />
+                  <SidebarLink icon={<Icons.fileText className="w-4 h-4" />} title="Judging Rubric" href="/rulebook" />
+                  <SidebarLink icon={<Icons.settings className="w-4 h-4" />} title="Workspace Settings" href="/workspace/profile" />
+                </div>
+              </div>
+
+              {/* System Log / Authenticity */}
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-foreground tracking-tight">System Log</h3>
+                </div>
+                
+                <div className="flex flex-col gap-5 p-8 border border-border rounded-xl bg-muted/5 shadow-sm min-h-[200px] items-center justify-center text-center">
+                  <Icons.activity className="w-6 h-6 text-muted-foreground mb-3 opacity-50" />
+                  <div className="text-xs font-mono text-muted-foreground uppercase tracking-widest">No recent alerts</div>
+                </div>
+              </div>
+            </div>
           </div>
-        </GlassCard>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function QuickActionCard({ icon, title, desc, href }: { icon: React.ReactNode, title: string, desc: string, href: string }) {
+function SidebarLink({ icon, title, href }: { icon: React.ReactNode, title: string, href: string }) {
   return (
-    <Link href={href}>
-      <GlassCard className="hover:border-primary/50 hover:bg-white/5 transition-all cursor-pointer group flex items-center gap-4 py-4 px-5">
-        <div className="p-2.5 bg-white/5 rounded-xl border border-white/5 group-hover:scale-110 transition-transform">
-          {icon}
-        </div>
-        <div>
-          <h4 className="text-sm font-semibold">{title}</h4>
-          <p className="text-xs text-muted-foreground">{desc}</p>
-        </div>
-      </GlassCard>
+    <Link href={href} className="flex items-center gap-3 px-4 py-3 rounded-lg border border-border bg-background hover:border-primary/30 hover:bg-primary/5 transition-colors group shadow-sm">
+      <div className="text-muted-foreground group-hover:text-primary transition-colors">
+        {icon}
+      </div>
+      <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{title}</span>
     </Link>
   );
 }

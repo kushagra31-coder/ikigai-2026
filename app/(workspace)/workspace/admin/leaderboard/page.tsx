@@ -6,7 +6,7 @@ export default function AdminLeaderboardPage() {
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-yellow-400">Leaderboard Operations</h1>
+        <h1 className="text-3xl font-bold text-warning mb-6">Leaderboard Command Center</h1>
         <p className="text-muted-foreground mt-1">Control visibility, freeze states, and manage final exports.</p>
       </div>
       

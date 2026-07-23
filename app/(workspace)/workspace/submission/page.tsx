@@ -7,12 +7,23 @@ import { Button } from '@/components/primitives/button';
 import { Badge } from '@/components/primitives/badge';
 import { useToast } from '@/components/providers/ToastProvider';
 
+import { useWorkspaceTeam } from '@/features/workspace/hooks/useWorkspaceTeam';
+import { useSubmissionData } from '@/features/workspace/hooks/useSubmissionData';
+
 export default function SubmissionPage() {
-  const { success, error } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [github, setGithub] = useState('https://github.com/neural-ninjas/core');
-  const [presentation, setPresentation] = useState('');
-  const [video, setVideo] = useState('');
+  const { error } = useToast();
+  const { teamId, loading: teamLoading } = useWorkspaceTeam();
+  const {
+    loading: subLoading,
+    saving,
+    github, setGithub,
+    presentation, setPresentation,
+    video, setVideo,
+    status,
+    saveSubmission
+  } = useSubmissionData(teamId);
+
+  const loading = teamLoading || subLoading;
 
   const calculateProgress = () => {
     let progress = 0;
@@ -27,7 +38,7 @@ export default function SubmissionPage() {
   const progress = calculateProgress();
 
   const handleSaveDraft = () => {
-    success('Draft Saved', 'Your submission draft has been securely saved.');
+    saveSubmission(false);
   };
 
   const handleSubmit = () => {
@@ -35,11 +46,7 @@ export default function SubmissionPage() {
       error('Validation Failed', 'Please complete all required fields before final submission.');
       return;
     }
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      success('Project Submitted!', 'Your final project has been successfully submitted for review.');
-    }, 1500);
+    saveSubmission(true);
   };
 
   return (
@@ -130,10 +137,10 @@ export default function SubmissionPage() {
               <Button 
                 variant="primary" 
                 className="w-full sm:w-auto" 
-                disabled={isSubmitting}
+                disabled={saving || loading}
                 onClick={handleSubmit}
               >
-                {isSubmitting ? (
+                {saving ? (
                   <span className="flex items-center gap-2">
                     <Icons.logo className="w-4 h-4 animate-spin" /> Submitting...
                   </span>

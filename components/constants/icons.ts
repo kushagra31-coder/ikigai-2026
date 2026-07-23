@@ -63,6 +63,10 @@ import {
   FileText,
   MessageCircle,
   Database,
+  Filter,
+  Radio,
+  Inbox,
+  Lock,
   type LucideIcon
 } from 'lucide-react';
 
@@ -133,6 +137,7 @@ export const Icons = {
   phone: Phone,
   instagram: Camera,
   linkedin: Globe,
+  globe: Globe,
   github: Code,
   trendingUp: TrendingUp,
   trendingDown: TrendingDown,
@@ -149,4 +154,8 @@ export const Icons = {
   fileText: FileText,
   whatsapp: MessageCircle,
   database: Database,
+  filter: Filter,
+  radio: Radio,
+  inbox: Inbox,
+  lock: Lock,
 } as const;

@@ -7,82 +7,37 @@ import { Button } from '@/components/primitives/button';
 import { Badge } from '@/components/primitives/badge';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type TaskStatus = 'Pending' | 'Completed' | 'Overdue';
-type TaskPriority = 'High' | 'Medium' | 'Low';
 
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  priority: TaskPriority;
-  status: TaskStatus;
-  deadline: string;
-  mentor: string;
-}
 
-const MOCK_TASKS: Task[] = [
-  {
-    id: '1',
-    title: 'Submit Initial Architecture Diagram',
-    description: 'Create a high-level system architecture diagram for your project and submit it for review.',
-    priority: 'High',
-    status: 'Completed',
-    deadline: '2026-07-01T12:00:00Z',
-    mentor: 'Dr. Alan Turing',
-  },
-  {
-    id: '2',
-    title: 'Set up Database Schema',
-    description: 'Initialize your Supabase database and set up the necessary tables and RLS policies.',
-    priority: 'High',
-    status: 'Pending',
-    deadline: '2026-07-02T18:00:00Z',
-    mentor: 'Grace Hopper',
-  },
-  {
-    id: '3',
-    title: 'Complete UI Mockups',
-    description: 'Design the primary user interfaces in Figma and share the link.',
-    priority: 'Medium',
-    status: 'Overdue',
-    deadline: '2026-07-01T10:00:00Z',
-    mentor: 'Ada Lovelace',
-  },
-  {
-    id: '4',
-    title: 'Implement Authentication',
-    description: 'Integrate authentication using the provided credentials.',
-    priority: 'Low',
-    status: 'Pending',
-    deadline: '2026-07-03T12:00:00Z',
-    mentor: 'Dr. Alan Turing',
-  }
-];
+import { useWorkspaceTeam } from '@/features/workspace/hooks/useWorkspaceTeam';
+import { useTasks } from '@/features/workspace/hooks/useTasks';
 
 export default function TasksPage() {
-  const [filter, setFilter] = useState<'All' | TaskStatus>('All');
+  const { teamId, loading: teamLoading } = useWorkspaceTeam();
+  const { tasks: dbTasks, loading: tasksLoading, toggleTaskStatus } = useTasks(teamId);
+  const [filter, setFilter] = useState<'All' | string>('All');
   const [search, setSearch] = useState('');
 
-  const filteredTasks = MOCK_TASKS.filter(task => {
-    const matchesFilter = filter === 'All' || task.status === filter;
+  const loading = teamLoading || tasksLoading;
+
+  const filteredTasks = dbTasks.filter(task => {
+    const matchesFilter = filter === 'All' || task.status === filter.toUpperCase();
     const matchesSearch = task.title.toLowerCase().includes(search.toLowerCase()) || 
-                          task.description.toLowerCase().includes(search.toLowerCase());
+                          (task.description && task.description.toLowerCase().includes(search.toLowerCase()));
     return matchesFilter && matchesSearch;
   });
 
-  const getPriorityColor = (priority: TaskPriority) => {
-    switch(priority) {
-      case 'High': return 'text-destructive bg-destructive/10 border-destructive/20';
-      case 'Medium': return 'text-warning bg-warning/10 border-warning/20';
-      case 'Low': return 'text-success bg-success/10 border-success/20';
-    }
+  const getPriorityColor = () => {
+    // Tasks table schema doesn't have priority, just return a default or derive from due_date
+    return 'text-warning bg-warning/10 border-warning/20';
   };
 
-  const getStatusColor = (status: TaskStatus) => {
-    switch(status) {
-      case 'Pending': return 'text-warning bg-warning/10 border-warning/20';
-      case 'Completed': return 'text-success bg-success/10 border-success/20';
-      case 'Overdue': return 'text-destructive bg-destructive/10 border-destructive/20';
+  const getStatusColor = (status: string) => {
+    switch(status.toUpperCase()) {
+      case 'PENDING': return 'text-warning bg-warning/10 border-warning/20';
+      case 'COMPLETED': return 'text-success bg-success/10 border-success/20';
+      case 'OVERDUE': return 'text-destructive bg-destructive/10 border-destructive/20';
+      default: return 'text-muted-foreground bg-white/5 border-white/10';
     }
   };
 
@@ -110,7 +65,7 @@ export default function TasksPage() {
           {['All', 'Pending', 'Completed', 'Overdue'].map((f) => (
             <button
               key={f}
-              onClick={() => setFilter(f as typeof filter)}
+              onClick={() => setFilter(f)}
               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
                 filter === f 
                   ? 'bg-primary text-primary-foreground shadow-lg' 
@@ -125,7 +80,17 @@ export default function TasksPage() {
 
       <div className="grid grid-cols-1 gap-4 pb-12">
         <AnimatePresence mode="popLayout">
-          {filteredTasks.length === 0 ? (
+          {loading ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="py-12 flex flex-col items-center justify-center text-center bg-white/5 border border-white/5 rounded-2xl"
+            >
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+              <h3 className="text-lg font-semibold">Loading tasks...</h3>
+            </motion.div>
+          ) : filteredTasks.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -154,28 +119,32 @@ export default function TasksPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-bold group-hover:text-primary transition-colors">{task.title}</h3>
-                      <Badge className={`px-2 py-0.5 text-xs ${getPriorityColor(task.priority)}`}>
-                        {task.priority} Priority
-                      </Badge>
                     </div>
                     <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
-                      {task.description}
+                      {task.description || 'No description provided.'}
                     </p>
                     <div className="flex flex-wrap items-center gap-4 text-xs font-medium">
                       <div className="flex items-center gap-1.5 text-muted-foreground bg-white/5 px-2.5 py-1 rounded-md">
-                        <Icons.user className="w-3.5 h-3.5" /> Mentor: {task.mentor}
+                        <Icons.user className="w-3.5 h-3.5" /> Mentor: {task.mentor?.full_name || 'Unassigned'}
                       </div>
-                      <div className="flex items-center gap-1.5 text-muted-foreground bg-white/5 px-2.5 py-1 rounded-md">
-                        <Icons.clock className="w-3.5 h-3.5" /> Deadline: {new Date(task.deadline).toLocaleString()}
-                      </div>
+                      {task.due_date && (
+                        <div className="flex items-center gap-1.5 text-muted-foreground bg-white/5 px-2.5 py-1 rounded-md">
+                          <Icons.clock className="w-3.5 h-3.5" /> Deadline: {new Date(task.due_date).toLocaleString()}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-row md:flex-col items-center md:items-end justify-between shrink-0 gap-4 border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-6">
                     <Badge className={`px-3 py-1 ${getStatusColor(task.status)} uppercase tracking-wider font-bold`}>
                       {task.status}
                     </Badge>
-                    <Button variant="outline" size="sm" className="w-full md:w-auto" disabled={task.status === 'Completed'}>
-                      {task.status === 'Completed' ? 'Done' : 'Mark Complete'}
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full md:w-auto" 
+                      onClick={() => toggleTaskStatus(task.id, task.status)}
+                    >
+                      {task.status === 'COMPLETED' ? 'Mark Pending' : 'Mark Complete'}
                     </Button>
                   </div>
                 </GlassCard>

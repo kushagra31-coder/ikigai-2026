@@ -32,8 +32,8 @@ const DotField = memo(({
   glowRadius = 160,
   sparkle = false,
   waveAmplitude = 0,
-  gradientFrom = 'rgba(16, 185, 129, 0.35)', // Emerald Green default
-  gradientTo = 'rgba(5, 150, 105, 0.25)', // Darker Emerald default
+  gradientFrom = 'rgba(147, 51, 234, 0.3)', // Brand Purple
+  gradientTo = 'rgba(6, 182, 212, 0.2)', // Brand Cyan
   glowColor = '#050505',
   className = '',
   ...rest

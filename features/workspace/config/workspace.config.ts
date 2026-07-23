@@ -10,45 +10,37 @@ export interface NavItem {
   disabled?: boolean;
 }
 
+/**
+ * Canonical workspace navigation.
+ * Only MENTOR and ADMIN roles reach the workspace (enforced by WorkspaceLayout).
+ * TEAM / USER items have been removed — this is an operations platform, not a participant portal.
+ */
 export const WORKSPACE_NAV: NavItem[] = [
+  // ─── Shared (Mentor + Admin) ─────────────────────────────────────────────
   {
     title: 'Dashboard',
     href: '/workspace',
     icon: 'dashboard',
-    roles: ['USER', 'TEAM', 'MENTOR', 'ADMIN'],
-  },
-  {
-    title: 'Profile',
-    href: '/workspace/profile',
-    icon: 'user',
-    roles: ['USER', 'TEAM', 'MENTOR', 'ADMIN'],
-  },
-  {
-    title: 'Tasks',
-    href: '/workspace/tasks',
-    icon: 'check',
-    roles: ['TEAM'],
-  },
-  {
-    title: 'Submission',
-    href: '/workspace/submission',
-    icon: 'upload',
-    roles: ['TEAM'],
+    roles: ['MENTOR', 'ADMIN'],
   },
   {
     title: 'Announcements',
     href: '/workspace/announcements',
     icon: 'bell',
-    roles: ['USER', 'TEAM', 'MENTOR', 'ADMIN'],
+    roles: ['MENTOR', 'ADMIN'],
   },
+
+  // ─── Mentor ──────────────────────────────────────────────────────────────
   {
-    title: 'Scores',
-    href: '/workspace/scores',
-    icon: 'star',
-    roles: ['TEAM'],
+    title: 'Judge Panel',
+    href: '/workspace/mentor',
+    icon: 'fileText',
+    roles: ['MENTOR'],
   },
+
+  // ─── Admin ───────────────────────────────────────────────────────────────
   {
-    title: 'Admin Panel',
+    title: 'Mission Control',
     href: '/workspace/admin',
     icon: 'shield',
     roles: ['ADMIN'],
@@ -78,7 +70,7 @@ export const WORKSPACE_NAV: NavItem[] = [
     roles: ['ADMIN'],
   },
   {
-    title: 'Push Announcements',
+    title: 'Announcements',
     href: '/workspace/admin/announcements',
     icon: 'bell',
     roles: ['ADMIN'],
@@ -89,40 +81,30 @@ export const WORKSPACE_NAV: NavItem[] = [
     icon: 'trophy',
     roles: ['ADMIN'],
   },
-  {
-    title: 'Judge Panel',
-    href: '/workspace/judge',
-    icon: 'fileText',
-    roles: ['MENTOR'],
-  },
+
+  // ─── Settings (Shared) ───────────────────────────────────────────────────
   {
     title: 'Settings',
     href: '/workspace/settings',
     icon: 'settings',
-    roles: ['USER', 'TEAM', 'MENTOR', 'ADMIN'],
-  }
+    roles: ['MENTOR', 'ADMIN'],
+  },
 ];
 
+// Workspace quick-actions (command palette) — admin only
 export const WORKSPACE_ACTIONS = [
   {
-    id: 'create-team',
-    title: 'Create Team',
-    icon: 'add' as keyof typeof Icons,
-    shortcut: ['C', 'T'],
-    roles: ['USER'],
+    id: 'push-announcement',
+    title: 'Push Announcement',
+    icon: 'radio' as keyof typeof Icons,
+    shortcut: ['P', 'A'],
+    roles: ['ADMIN'],
   },
   {
-    id: 'join-team',
-    title: 'Join Team',
-    icon: 'users' as keyof typeof Icons,
-    shortcut: ['J', 'T'],
-    roles: ['USER'],
-  },
-  {
-    id: 'submit-project',
-    title: 'Submit Project',
-    icon: 'upload' as keyof typeof Icons,
-    shortcut: ['S', 'P'],
-    roles: ['TEAM'],
+    id: 'view-leaderboard',
+    title: 'View Leaderboard',
+    icon: 'trophy' as keyof typeof Icons,
+    shortcut: ['V', 'L'],
+    roles: ['MENTOR', 'ADMIN'],
   },
 ];

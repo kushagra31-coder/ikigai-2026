@@ -12,7 +12,7 @@ export default function AdminEvaluationsPage() {
     fetchEvaluations();
 
     const channel = supabase()
-      .channel(`admin:evaluations:${Math.random()}`)
+      .channel('admin:evaluations')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'evaluations' },
@@ -119,7 +119,7 @@ export default function AdminEvaluationsPage() {
                   <td className="py-3 px-4 text-right">
                     <button 
                       onClick={() => handleDelete(ev.id)}
-                      className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                      className="text-destructive hover:text-destructive/80 transition-colors"
                     >
                       Delete
                     </button>

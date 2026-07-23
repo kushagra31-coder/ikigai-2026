@@ -1,65 +1,107 @@
 'use client';
 
-import { useState } from 'react';
-import { Container, Section, Stack } from '@/components/layout';
+import { Container } from '@/components/layout';
 import { PUBLIC_CONTENT } from '@/components/constants/public-content';
-import { Fade, Slide } from '@/components/motion';
 import { Icons } from '@/components/constants/icons';
-import { motion, AnimatePresence } from 'framer-motion';
+import { FaqSearch } from '@/components/faq/FaqSearch';
+import { useState } from 'react';
 
 export default function FAQPage() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const { faq, contact } = PUBLIC_CONTENT;
+  const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <Section className="pt-32 min-h-screen">
-      <Container className="max-w-3xl">
-        <Fade>
-          <div className="text-center mb-16 space-y-4">
-            <h1 className="text-display font-bold">Frequently Asked Questions</h1>
-            <p className="text-body-l text-muted-foreground">
-              Everything you need to know about IKIGAI 2026.
+    <div className="min-h-screen bg-background text-foreground mt-20">
+      {/* Hero */}
+      <div className="bg-background text-foreground py-32 border-b border-border/30 relative overflow-hidden">
+        {/* Subtle glowing background orb */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-500/5 rounded-full blur-[120px] pointer-events-none" />
+        
+        <Container className="relative z-10">
+          <div className="max-w-4xl">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-cyan-500 mb-8 flex items-center gap-4">
+              <span className="w-12 h-px bg-cyan-500/30" />
+              Knowledge Base
+            </div>
+            <h1 className="text-6xl md:text-8xl font-semibold tracking-tighter mb-8 leading-[0.9]">
+              FAQ &<br />Guidelines
+            </h1>
+            <p className="text-2xl text-muted-foreground font-light leading-relaxed max-w-2xl">
+              Answers to common questions regarding competition structure, eligibility, and evaluation criteria.
             </p>
           </div>
-        </Fade>
+        </Container>
+      </div>
 
-        <Stack className="space-y-4">
-          {PUBLIC_CONTENT.faq.map((item, idx) => {
-            const isOpen = openIndex === idx;
-            
-            return (
-              <Slide key={item.id} direction="up" delay={idx * 0.1}>
-                <div className="border border-white/10 rounded-xl overflow-hidden bg-card/40 backdrop-blur-sm">
-                  <button
-                    onClick={() => setOpenIndex(isOpen ? null : idx)}
-                    className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                    aria-expanded={isOpen}
-                  >
-                    <span className="font-semibold text-lg">{item.question}</span>
-                    <Icons.chevronDown 
-                      className={`w-5 h-5 text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-                    />
-                  </button>
-                  
-                  <AnimatePresence>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
-                      >
-                        <div className="px-6 pb-4 text-muted-foreground border-t border-white/5 pt-4">
-                          {item.answer}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </Slide>
-            );
-          })}
-        </Stack>
+      <Container className="py-24">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-16 xl:gap-24">
+
+          {/* Sidebar */}
+          <div className="xl:col-span-4 flex flex-col gap-8">
+            {/* Search input — owned here, passed to FaqSearch */}
+            <div className="relative w-full">
+              <Icons.search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search knowledge base..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-muted/5 border border-border/50 rounded-xl px-12 py-4 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-background transition-all duration-300 text-foreground placeholder:text-muted-foreground shadow-[inset_0_2px_10px_rgba(0,0,0,0.1)]"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Clear search"
+                >
+                  <Icons.close className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Result count badge */}
+            {searchQuery && (
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                {faq.filter(
+                  (f) =>
+                    f.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    f.answer.toLowerCase().includes(searchQuery.toLowerCase())
+                ).length}{' '}
+                result{faq.filter(
+                  (f) =>
+                    f.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    f.answer.toLowerCase().includes(searchQuery.toLowerCase())
+                ).length !== 1 ? 's' : ''} found
+              </div>
+            )}
+
+            {/* Contact block */}
+            <div className="border border-border/50 bg-muted/5 rounded-xl p-8 hover:border-cyan-500/30 hover:shadow-[0_0_20px_rgba(6,182,212,0.05)] transition-all duration-300">
+              <h3 className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-4 border-b border-border/50 pb-2">
+                Still need help?
+              </h3>
+              <p className="text-sm text-foreground/80 leading-relaxed mb-6">
+                If you cannot find the answer you are looking for, contact operations directly.
+              </p>
+              <a
+                href={`mailto:${contact.email}`}
+                className="text-sm font-semibold text-cyan-500 hover:text-cyan-400 transition-colors flex items-center gap-2 group"
+              >
+                <Icons.mail className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
+                {contact.email}
+              </a>
+            </div>
+          </div>
+
+          {/* FAQ Accordion — shared component with controlled search */}
+          <div className="xl:col-span-8">
+            <FaqSearch
+              items={faq}
+              externalQuery={searchQuery}
+            />
+          </div>
+        </div>
       </Container>
-    </Section>
+    </div>
   );
 }

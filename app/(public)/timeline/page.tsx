@@ -1,103 +1,124 @@
-import { Container, Section } from '@/components/layout';
-import { Fade, Slide } from '@/components/motion';
-import { GlassCard } from '@/components/data-display/GlassCard';
+'use client';
+
+import { Container } from '@/components/layout';
 import IKIGAI2026_CONFIG from '@/config/event.config';
-
-export const metadata = {
-  title: 'Timeline | IKIGAI 2026',
-  description: 'From registration to the final demo day, here\'s everything that happens at IKIGAI 2026.',
-};
-
-const typeColors: Record<string, string> = {
-  registration: 'text-green-400 bg-green-400/10 border-green-400/30',
-  submission: 'text-blue-400 bg-blue-400/10 border-blue-400/30',
-  evaluation: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30',
-  event: 'text-primary bg-primary/10 border-primary/30',
-  presentation: 'text-orange-400 bg-orange-400/10 border-orange-400/30',
-  ceremony: 'text-pink-400 bg-pink-400/10 border-pink-400/30',
-};
-
-const typeEmoji: Record<string, string> = {
-  registration: '📋',
-  submission: '📤',
-  evaluation: '🔍',
-  event: '⚡',
-  presentation: '🎯',
-  ceremony: '🏆',
-};
+import { motion, useScroll, useSpring } from 'framer-motion';
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
-  return d.toLocaleDateString('en-IN', {
+  return d.toLocaleDateString('en-US', {
     day: 'numeric',
-    month: 'long',
+    month: 'short',
     year: 'numeric',
-    timeZone: 'Asia/Kolkata',
+  });
+}
+
+function formatTime(dateStr: string) {
+  const d = new Date(dateStr);
+  return d.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
   });
 }
 
 export default function TimelinePage() {
   const timeline = IKIGAI2026_CONFIG.timeline;
+  
+  const { scrollYProgress } = useScroll();
+  const scaleY = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   return (
-    <Section className="pt-32 min-h-screen">
-      <Container>
-        <Fade>
-          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <h1 className="text-display font-bold">Event Timeline</h1>
-            <p className="text-body-l text-muted-foreground">
-              From registration to the final demo day, here&apos;s everything that happens at IKIGAI 2026.
+    <div className="min-h-screen bg-background text-foreground mt-20">
+      <div className="bg-foreground text-background py-24 border-b border-border">
+        <Container>
+          <div className="max-w-3xl">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-background/50 mb-6">Operations Roadmap</div>
+            <h1 className="text-5xl md:text-6xl font-semibold tracking-tighter mb-6">Mission Timeline</h1>
+            <p className="text-xl text-background/70 font-light leading-relaxed">
+              The strategic sequence of events for IKIGAI 2026. All times are displayed in IST and strictly enforced.
             </p>
           </div>
-        </Fade>
+        </Container>
+      </div>
 
-        <div className="max-w-3xl mx-auto relative">
-          {/* Vertical line */}
-          <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-primary/60 via-accent/40 to-transparent md:-translate-x-1/2" />
+      <Container className="py-24 relative">
+        <div className="hidden lg:block absolute left-[50%] top-24 bottom-24 w-px bg-border -translate-x-1/2">
+          <motion.div className="w-full bg-primary origin-top" style={{ scaleY }} />
+        </div>
 
-          <div className="space-y-8">
-            {timeline.map((item: any, idx: number) => {
-              const isLeft = idx % 2 === 0;
-              const colorClass = typeColors[item.type] || 'text-primary bg-primary/10 border-primary/30';
-              const emoji = typeEmoji[item.type] || '📅';
+        <div className="flex flex-col gap-0 max-w-5xl mx-auto">
+          {timeline.map((item: any, idx: number) => {
+            // Simulated status for visual distinction based on index
+            const status = idx === 0 ? 'completed' : idx === 1 ? 'active' : 'upcoming';
+            const isLeft = idx % 2 === 0;
 
-              return (
-                <Slide key={item.id} direction={isLeft ? 'right' : 'left'} delay={idx * 0.1}>
-                  <div className={`relative flex items-start gap-4 md:gap-0 ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
-                    {/* Dot */}
-                    <div className="absolute left-6 md:left-1/2 w-5 h-5 rounded-full bg-background border-2 border-primary shadow-[0_0_10px_rgba(124,58,237,0.5)] -translate-x-1/2 mt-5 z-10" />
+            return (
+              <div key={item.id} className="relative flex flex-col lg:flex-row items-center w-full min-h-[300px]">
+                
+                {/* Left Side (Data) */}
+                <div className={`w-full lg:w-1/2 flex ${isLeft ? 'lg:justify-end lg:pr-16' : 'lg:justify-end lg:pr-16 lg:order-2 lg:text-left'} order-1 mb-8 lg:mb-0 text-left ${isLeft ? 'lg:text-right' : ''}`}>
+                  <div className={`flex flex-col ${isLeft ? 'lg:items-end' : 'lg:items-start'} max-w-sm`}>
+                    <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4 border border-border px-3 py-1 bg-muted/10">
+                      Phase 0{idx + 1}
+                    </div>
+                    <h3 className={`text-3xl font-semibold tracking-tight mb-4 ${status === 'upcoming' ? 'text-muted-foreground' : 'text-foreground'}`}>
+                      {item.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                      {item.description}
+                    </p>
+                    {item.notes?.length > 0 && (
+                      <div className={`flex flex-col gap-2 ${isLeft ? 'lg:items-end' : 'lg:items-start'}`}>
+                        {item.notes.map((note: string, nIdx: number) => (
+                          <div key={nIdx} className="text-xs font-mono text-muted-foreground bg-muted/20 px-2 py-1 border border-border">
+                            {note}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-                    {/* Content */}
-                    <div className={`w-full pl-16 md:pl-0 md:w-[45%] ${isLeft ? 'md:pr-12' : 'md:pl-12'}`}>
-                      <GlassCard className="p-6 hover:border-primary/40 transition-colors">
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className="text-xl">{emoji}</span>
-                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${colorClass}`}>
-                            {item.type.toUpperCase()}
-                          </span>
-                        </div>
-                        <p className="text-sm font-bold text-accent mb-1">{formatDate(item.start)}</p>
-                        <h3 className="text-lg font-bold mb-2">{item.title}</h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
-                        {item.notes?.length > 0 && (
-                          <ul className="mt-3 space-y-1">
-                            {item.notes.map((note: string, nIdx: number) => (
-                              <li key={nIdx} className="text-xs text-muted-foreground flex items-start gap-2">
-                                <span className="text-primary mt-0.5">•</span>
-                                {note}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </GlassCard>
+                {/* Center Node (Progress Line indicator, but no dots as requested - just structural connection) */}
+                <div className="hidden lg:flex w-[2px] h-full items-center justify-center relative order-2 z-10" />
+
+                {/* Right Side (Timing) */}
+                <div className={`w-full lg:w-1/2 flex ${isLeft ? 'lg:justify-start lg:pl-16' : 'lg:justify-start lg:pl-16 lg:order-1 lg:justify-end lg:pr-16'} order-3`}>
+                  <div className={`bg-card border ${status === 'active' ? 'border-primary' : 'border-border'} p-8 w-full max-w-sm flex flex-col justify-center`}>
+                    <div className="flex justify-between items-center border-b border-border pb-4 mb-4">
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Status</span>
+                      <span className={`text-[10px] font-mono uppercase tracking-widest font-bold ${
+                        status === 'active' ? 'text-primary animate-pulse' :
+                        status === 'completed' ? 'text-foreground' : 'text-muted-foreground'
+                      }`}>
+                        {status}
+                      </span>
+                    </div>
+                    
+                    <div className="flex flex-col gap-1 mb-6">
+                      <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Date</div>
+                      <div className="text-2xl font-semibold tracking-tight">{formatDate(item.start)}</div>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Time Window</div>
+                      <div className="text-lg font-mono text-muted-foreground">
+                        {formatTime(item.start)} — {formatTime(item.end)}
+                      </div>
                     </div>
                   </div>
-                </Slide>
-              );
-            })}
-          </div>
+                </div>
+
+              </div>
+            );
+          })}
         </div>
       </Container>
-    </Section>
+    </div>
   );
 }

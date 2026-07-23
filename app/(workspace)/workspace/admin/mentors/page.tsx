@@ -81,7 +81,7 @@ export default function AdminMentorsPage() {
                 <td className="py-3 px-4 text-muted-foreground">{mentor.email}</td>
                 <td className="py-3 px-4">
                   <select 
-                    className="bg-black/20 border border-white/10 rounded-md p-2 text-sm focus:border-primary outline-none min-w-[200px]"
+                    className="bg-black/20 border border-white/10 rounded-md p-2 text-sm focus:border-primary outline-none min-w-[200px] [&>option]:bg-zinc-900 [&>option]:text-white"
                     value={mentor.assigned_track_id || 'unassigned'}
                     onChange={(e) => handleTrackAssign(mentor.id, e.target.value)}
                     disabled={savingId === mentor.id}

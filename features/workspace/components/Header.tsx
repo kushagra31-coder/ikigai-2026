@@ -12,37 +12,39 @@ export const Header = () => {
   const { openSidebar } = useWorkspace();
   const pathname = usePathname();
 
-  // Generate breadcrumb from pathname
   const segments = pathname.split('/').filter(Boolean);
   const breadcrumb = segments.map(seg => seg.charAt(0).toUpperCase() + seg.slice(1)).join(' / ');
 
   return (
-    <header className="h-16 border-b border-white/5 bg-background/50 backdrop-blur-md flex items-center px-4 justify-between sticky top-0 z-30 w-full">
+    <header className="h-16 border-b border-border bg-background flex items-center px-6 justify-between sticky top-0 z-30 w-full shrink-0 shadow-sm">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={openSidebar} className="lg:hidden text-muted-foreground hover:text-foreground">
+        <Button variant="ghost" size="icon" onClick={openSidebar} className="lg:hidden text-muted-foreground hover:text-foreground -ml-2">
           <Icons.menu className="h-5 w-5" />
         </Button>
-        <div className="hidden sm:flex items-center text-sm text-muted-foreground font-medium">
+        <div className="hidden sm:flex items-center text-xs font-semibold text-muted-foreground uppercase tracking-widest">
           {breadcrumb}
         </div>
       </div>
       
-      <div className="flex items-center gap-2 sm:gap-4">
-        <div className="hidden sm:flex items-center mr-2 px-3 py-1.5 bg-white/5 rounded-full text-xs text-muted-foreground border border-white/5">
+      <div className="flex items-center gap-3">
+        <button className="hidden sm:flex items-center px-3 py-1.5 bg-white/5 hover:bg-white/10 transition-colors rounded-md text-xs text-muted-foreground border border-white/5 cursor-pointer">
           <Icons.search className="w-3.5 h-3.5 mr-2" />
-          <span>Press</span>
-          <kbd className="mx-1 px-1.5 py-0.5 bg-background rounded border border-white/10 font-mono text-[10px] uppercase font-semibold text-foreground">Ctrl K</kbd>
-          <span>to search</span>
-        </div>
+          <span>Search</span>
+          <div className="flex items-center gap-1 ml-4">
+            <kbd className="px-1.5 py-0.5 bg-background rounded-[4px] border border-white/10 font-mono text-[10px] font-semibold">Ctrl</kbd>
+            <kbd className="px-1.5 py-0.5 bg-background rounded-[4px] border border-white/10 font-mono text-[10px] font-semibold">K</kbd>
+          </div>
+        </button>
         
         <Button variant="ghost" size="icon" className="sm:hidden text-muted-foreground hover:text-foreground">
-          <Icons.search className="h-5 w-5" />
+          <Icons.search className="h-4 w-4" />
         </Button>
         
-        <ThemeToggle />
-        <NotificationBell />
-        <div className="w-px h-6 bg-white/10 mx-1 hidden sm:block" />
-        <UserMenu />
+        <div className="flex items-center gap-1 pl-2 border-l border-white/10 ml-2">
+          <ThemeToggle />
+          <NotificationBell />
+          <UserMenu />
+        </div>
       </div>
     </header>
   );

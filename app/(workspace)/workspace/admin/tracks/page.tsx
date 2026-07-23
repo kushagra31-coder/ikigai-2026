@@ -110,7 +110,7 @@ export default function AdminTracksPage() {
                 </td>
                 <td className="py-3 px-4 text-right space-x-3">
                   <button onClick={() => handleOpenModal(track)} className="text-primary hover:text-primary/80 transition-colors text-xs">Edit</button>
-                  <button onClick={() => handleDelete(track.id)} className="text-red-400 hover:text-red-300 transition-colors text-xs">Delete</button>
+                  <button onClick={() => handleDelete(track.id)} className="text-destructive hover:text-destructive/80 transition-colors text-xs">Delete</button>
                 </td>
               </tr>
             ))}

@@ -6,7 +6,7 @@ export class ProfileService {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select('*, tracks(name)')
       .eq('id', authId)
       .single();
 

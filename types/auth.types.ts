@@ -8,6 +8,9 @@ export interface Profile {
   full_name: string;
   role: Role;
   avatar_url?: string;
+  organization?: string;
+  assigned_track_id?: string;
+  tracks?: { name: string };
   created_at: string;
   updated_at: string;
 }

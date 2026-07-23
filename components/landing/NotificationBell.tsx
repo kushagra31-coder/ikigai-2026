@@ -89,37 +89,48 @@ export function NotificationBell() {
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="absolute right-0 mt-2 w-80 sm:w-96 bg-card border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden"
+              className="absolute right-0 mt-4 w-80 sm:w-96 z-50 origin-top-right"
             >
-              <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/5">
-                <h3 className="font-semibold flex items-center gap-2">
-                  <Icons.bell className="w-4 h-4" /> Announcements
-                </h3>
-              </div>
-              <div className="max-h-[400px] overflow-y-auto">
-                {announcements.length === 0 ? (
-                  <div className="p-6 text-center text-muted-foreground text-sm">
-                    No recent announcements.
-                  </div>
-                ) : (
-                  <div className="divide-y divide-white/5">
-                    {announcements.map((ann) => (
-                      <div key={ann.id} className="p-4 hover:bg-white/5 transition-colors">
-                        <div className="flex items-center gap-2 mb-2">
-                          {ann.priority === 'HIGH' && <span className="text-[10px] px-2 py-0.5 rounded bg-red-500/20 text-red-500 font-bold uppercase">High Priority</span>}
-                          {ann.priority === 'MEDIUM' && <span className="text-[10px] px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-500 font-bold uppercase">Medium</span>}
-                          <span className="text-[10px] text-muted-foreground ml-auto">
-                            {new Date(ann.published_at).toLocaleString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
+              <div className="bg-background/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden ring-1 ring-white/5">
+                <div className="p-5 border-b border-white/5 bg-gradient-to-r from-white/5 to-transparent flex items-center justify-between">
+                  <h3 className="font-semibold text-sm tracking-wide flex items-center gap-2">
+                    <Icons.bell className="w-4 h-4 text-primary" /> ANNOUNCEMENTS
+                  </h3>
+                </div>
+                <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                  {announcements.length === 0 ? (
+                    <div className="p-8 text-center flex flex-col items-center justify-center text-muted-foreground">
+                      <Icons.bell className="w-8 h-8 opacity-20 mb-3" />
+                      <p className="text-xs font-mono">ALL CAUGHT UP</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-white/5">
+                      {announcements.map((ann) => (
+                        <div key={ann.id} className="p-5 hover:bg-white/5 transition-all duration-200 group">
+                          <div className="flex items-center gap-2 mb-3">
+                            {ann.priority === 'HIGH' && (
+                              <span className="text-[9px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-500 font-bold uppercase tracking-wider border border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.2)]">
+                                High Priority
+                              </span>
+                            )}
+                            {ann.priority === 'MEDIUM' && (
+                              <span className="text-[9px] px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-500 font-bold uppercase tracking-wider border border-yellow-500/20">
+                                Update
+                              </span>
+                            )}
+                            <span className="text-[10px] font-mono text-muted-foreground ml-auto opacity-70 group-hover:opacity-100 transition-opacity">
+                              {new Date(ann.published_at).toLocaleString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                          <h4 className="font-semibold text-sm mb-1.5 text-foreground leading-tight">{ann.title}</h4>
+                          <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
+                            {ann.content}
+                          </p>
                         </div>
-                        <h4 className="font-semibold text-sm mb-1">{ann.title}</h4>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
-                          {ann.content}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </motion.div>
           </>

@@ -20,12 +20,12 @@ vi.mock('@/lib/supabase/client', () => {
 
 describe('AuthService', () => {
   it('signInWithEmail calls supabase auth', async () => {
-    const result = await AuthService.signInWithEmail('test@test.com', 'password');
+    const result = await AuthService.signInWithEmail('test@test.com', 'password') as any;
     expect(result.user!.id).toBe('u1');
   });
 
   it('signUpWithEmail passes metadata correctly', async () => {
-    const result = await AuthService.signUpWithEmail('test@test.com', 'password', 'Test User');
+    const result = await AuthService.signUpWithEmail('test@test.com', 'password', 'Test User') as any;
     expect(result.user!.id).toBe('u2');
   });
 

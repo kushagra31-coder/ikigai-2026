@@ -15,14 +15,11 @@ export const Sidebar = () => {
   const filteredNav = WORKSPACE_NAV.filter(nav => nav.roles.includes(role || 'USER'));
 
   const SidebarContent = (
-    <div className="flex flex-col h-full bg-card border-r border-white/5 shadow-2xl">
-      <div className="h-16 flex items-center px-6 border-b border-white/5">
-        <Link href="/" className="flex items-center group">
-          <img 
-            src="/images/ikigai-logo.png" 
-            alt="IKIGAI 2026" 
-            className="h-8 w-auto object-contain transition-transform group-hover:scale-105 duration-200"
-          />
+    <div className="flex flex-col h-full bg-background border-r border-border shadow-sm">
+      <div className="h-16 flex items-center px-6 border-b border-border bg-background">
+        <Link href="/" className="flex items-center gap-2 group">
+          <Icons.cpu className="w-5 h-5 text-primary" />
+          <span className="font-semibold text-sm tracking-wide">IKIGAI 2026</span>
         </Link>
         <Button 
           variant="ghost" 
@@ -30,12 +27,12 @@ export const Sidebar = () => {
           onClick={closeSidebar} 
           className="ml-auto lg:hidden text-muted-foreground hover:text-foreground"
         >
-          <Icons.close className="w-5 h-5" />
+          <Icons.close className="w-4 h-4" />
         </Button>
       </div>
       
-      <div className="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-2">
-        <div className="px-2 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+      <div className="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-1">
+        <div className="px-2 mb-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
           Workspace
         </div>
         {filteredNav.map((item) => {
@@ -50,28 +47,28 @@ export const Sidebar = () => {
                   closeSidebar();
                 }
               }}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+              className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-sm font-medium ${
                 isActive 
-                  ? 'bg-primary/10 text-primary font-medium' 
+                  ? 'bg-primary/10 text-primary' 
                   : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
               } ${item.disabled ? 'opacity-50 pointer-events-none' : ''}`}
             >
-              {IconComp && <IconComp className="w-5 h-5" />}
+              {IconComp && <IconComp className="w-4 h-4 shrink-0" />}
               {item.title}
             </Link>
           );
         })}
       </div>
       
-      <div className="p-4 border-t border-white/5">
-        <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
-          <Icons.info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-          <div>
-            <p className="text-xs font-medium text-foreground">Need Help?</p>
-            <p className="text-[10px] text-muted-foreground mt-1 leading-relaxed">
-              Check the documentation or contact support via Ctrl+K.
-            </p>
+      <div className="p-4 mt-auto">
+        <div className="bg-white/[0.02] border border-white/5 rounded-lg p-3 flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Icons.info className="w-4 h-4 text-primary" />
+            <span className="text-xs font-semibold text-foreground">Need Help?</span>
           </div>
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
+            Press <kbd className="font-mono bg-white/5 px-1 py-0.5 rounded">Ctrl K</kbd> to search docs or contact support.
+          </p>
         </div>
       </div>
     </div>
@@ -100,8 +97,8 @@ export const Sidebar = () => {
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 left-0 bottom-0 w-72 z-50 lg:hidden"
+              transition={{ type: 'tween', duration: 0.25 }}
+              className="fixed top-0 left-0 bottom-0 w-72 z-50 lg:hidden border-r border-border"
             >
               {SidebarContent}
             </motion.aside>

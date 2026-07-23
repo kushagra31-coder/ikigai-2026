@@ -47,67 +47,14 @@ export const AuthService = {
     return data;
   },
 
-  async signInWithEmail(email: string, password: string): Promise<unknown> {
+  async signOut() {
     if (IS_MOCKED) {
-      await new Promise(r => setTimeout(r, 600));
-      setMockLoggedOut(false);
-      return { user: { ...MOCK_USER, email } };
-    }
-    const { createClient } = await import('@/lib/supabase/client');
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    return data;
-  },
-
-  async signUpWithEmail(email: string, password: string, fullName: string): Promise<unknown> {
-    if (IS_MOCKED) {
-      await new Promise(r => setTimeout(r, 600));
-      setMockLoggedOut(false);
-      return { user: { ...MOCK_USER, email, user_metadata: { full_name: fullName } } };
-    }
-    const { createClient } = await import('@/lib/supabase/client');
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName } },
-    });
-    if (error) throw error;
-    return data;
-  },
-
-  async signOut(): Promise<void> {
-    if (IS_MOCKED) {
-      await new Promise(r => setTimeout(r, 300));
       setMockLoggedOut(true);
       return;
     }
     const { createClient } = await import('@/lib/supabase/client');
     const supabase = createClient();
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-  },
-
-  async resetPassword(email: string): Promise<void> {
-    if (IS_MOCKED) {
-      await new Promise(r => setTimeout(r, 600));
-      return;
-    }
-    const { createClient } = await import('@/lib/supabase/client');
-    const supabase = createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/reset-password`,
-    });
-    if (error) throw error;
-  },
-
-  async updatePassword(password: string): Promise<void> {
-    if (IS_MOCKED) return;
-    const { createClient } = await import('@/lib/supabase/client');
-    const supabase = createClient();
-    const { error } = await supabase.auth.updateUser({ password });
-    if (error) throw error;
+    await supabase.auth.signOut();
   },
 
   async getSession() {

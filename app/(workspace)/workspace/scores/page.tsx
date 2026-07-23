@@ -50,7 +50,14 @@ const MOCK_SCORES: EvaluationSession[] = [
   }
 ];
 
+import { useWorkspaceTeam } from '@/features/workspace/hooks/useWorkspaceTeam';
+import { useScores } from '@/features/workspace/hooks/useScores';
+
 export default function ScoresPage() {
+  const { teamId, loading: teamLoading } = useWorkspaceTeam();
+  const { evaluations, loading: scoresLoading } = useScores(teamId);
+  const loading = teamLoading || scoresLoading;
+
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto h-full pb-12">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -61,7 +68,12 @@ export default function ScoresPage() {
       </div>
 
       <div className="flex flex-col gap-8 mt-4">
-        {MOCK_SCORES.length === 0 ? (
+        {loading ? (
+          <GlassCard className="py-16 flex flex-col items-center justify-center text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+            <h3 className="text-lg font-semibold">Loading scores...</h3>
+          </GlassCard>
+        ) : evaluations.length === 0 ? (
           <GlassCard className="py-16 flex flex-col items-center justify-center text-center">
             <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
               <Icons.star className="w-8 h-8 text-muted-foreground" />
@@ -72,7 +84,7 @@ export default function ScoresPage() {
             </p>
           </GlassCard>
         ) : (
-          MOCK_SCORES.map((evalSession, index) => {
+          evaluations.map((evalSession, index) => {
             const totalScore = evalSession.categories.reduce((acc, curr) => acc + curr.score, 0);
             const totalMax = evalSession.categories.reduce((acc, curr) => acc + curr.max, 0);
             const average = ((totalScore / totalMax) * 10).toFixed(1);

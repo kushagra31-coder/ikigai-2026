@@ -88,7 +88,7 @@ export default function AdminAnnouncementsPage() {
               <label className="text-xs font-medium text-muted-foreground uppercase">Priority</label>
               <select 
                 value={priority} onChange={e => setPriority(e.target.value)}
-                className="w-full p-2.5 rounded-lg bg-black/20 border border-white/10 text-sm focus:border-primary outline-none"
+                className="w-full p-2.5 rounded-lg bg-black/20 border border-white/10 text-sm focus:border-primary outline-none [&>option]:bg-zinc-900 [&>option]:text-white"
               >
                 <option value="HIGH">High (🔴)</option>
                 <option value="MEDIUM">Medium (🟡)</option>
@@ -130,8 +130,8 @@ export default function AdminAnnouncementsPage() {
               <tr key={ann.id} className="hover:bg-white/5">
                 <td className="py-3 px-4">
                   <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
-                    ann.priority === 'HIGH' ? 'bg-red-500/20 text-red-500' :
-                    ann.priority === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-500' : 'bg-white/10 text-muted-foreground'
+                    ann.priority === 'HIGH' ? 'bg-destructive/20 text-destructive' :
+                    ann.priority === 'MEDIUM' ? 'bg-warning/20 text-warning' : 'bg-white/10 text-muted-foreground'
                   }`}>
                     {ann.priority}
                   </span>
@@ -141,7 +141,7 @@ export default function AdminAnnouncementsPage() {
                   {new Date(ann.published_at).toLocaleString()}
                 </td>
                 <td className="py-3 px-4">
-                  <button onClick={() => handleDelete(ann.id)} className="text-red-500 hover:text-red-400 p-2">
+                  <button onClick={() => handleDelete(ann.id)} className="text-destructive hover:text-destructive/80 transition-colors">
                     <Icons.close className="w-4 h-4" />
                   </button>
                 </td>

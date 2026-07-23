@@ -8,57 +8,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 type AnnouncementPriority = 'High' | 'Normal';
 
-interface Announcement {
-  id: string;
-  title: string;
-  content: string;
-  priority: AnnouncementPriority;
-  date: string;
-  isPinned?: boolean;
-}
-
-const MOCK_ANNOUNCEMENTS: Announcement[] = [
-  {
-    id: '1',
-    title: 'Welcome to IKIGAI 2026',
-    content: 'We are thrilled to welcome you to the 36-hour hackathon. The opening ceremony will commence in the Main Hall. Please ensure your team is present and your hardware is configured correctly. Mentors will be available at their respective booths in 30 minutes.',
-    priority: 'Normal',
-    date: '2026-07-01T09:00:00Z',
-    isPinned: true,
-  },
-  {
-    id: '2',
-    title: 'Emergency Server Maintenance',
-    content: 'Please make sure to save your work. The databases will go offline for 5 minutes for a critical patch. Do not attempt to submit during this window.',
-    priority: 'High',
-    date: '2026-07-02T14:00:00Z',
-  },
-  {
-    id: '3',
-    title: 'Checkpoint 2 Guidelines Available',
-    content: 'The rubric for Checkpoint 2 has been released. You can find it in the resources section. Focus on the core functionality and technical feasibility of your MVP.',
-    priority: 'Normal',
-    date: '2026-07-02T10:00:00Z',
-  },
-  {
-    id: '4',
-    title: 'Midnight Snack Break',
-    content: 'Pizza and energy drinks have arrived in the cafeteria! Take a break and recharge before the final stretch.',
-    priority: 'Normal',
-    date: '2026-07-02T00:00:00Z',
-  }
-];
+import { useAnnouncements, Announcement } from '@/features/workspace/hooks/useAnnouncements';
 
 export default function AnnouncementsPage() {
-  const [search, setSearch] = useState('');
-  
-  const filteredAnnouncements = MOCK_ANNOUNCEMENTS.filter(a => 
-    a.title.toLowerCase().includes(search.toLowerCase()) || 
-    a.content.toLowerCase().includes(search.toLowerCase())
-  );
+  const { announcements, loading } = useAnnouncements();
 
-  const pinnedAnnouncements = filteredAnnouncements.filter(a => a.isPinned);
-  const unpinnedAnnouncements = filteredAnnouncements.filter(a => !a.isPinned);
+  const pinnedAnnouncements = announcements.filter(a => a.isPinned);
+  const unpinnedAnnouncements = announcements.filter(a => !a.isPinned);
 
   const AnnouncementCard = ({ a }: { a: Announcement }) => (
     <motion.div
@@ -106,20 +62,19 @@ export default function AnnouncementsPage() {
         </div>
       </div>
 
-      <div className="relative w-full">
-        <Icons.search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-        <input 
-          type="text" 
-          placeholder="Search announcements..." 
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-card border border-white/10 rounded-xl pl-12 pr-4 py-4 text-sm focus:border-primary outline-none transition-colors shadow-lg"
-        />
-      </div>
-
       <div className="flex flex-col gap-8 pb-12 mt-2">
         <AnimatePresence mode="popLayout">
-          {filteredAnnouncements.length === 0 ? (
+          {loading ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="py-12 flex flex-col items-center justify-center text-center bg-white/5 border border-white/5 rounded-2xl"
+            >
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+              <h3 className="text-lg font-semibold">Loading...</h3>
+            </motion.div>
+          ) : announcements.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -129,10 +84,7 @@ export default function AnnouncementsPage() {
               <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
                 <Icons.bell className="w-8 h-8 text-muted-foreground" />
               </div>
-              <h3 className="text-lg font-semibold">No announcements found</h3>
-              <p className="text-muted-foreground text-sm mt-1 max-w-sm">
-                Try adjusting your search query.
-              </p>
+              <h3 className="text-lg font-semibold">No announcements yet</h3>
             </motion.div>
           ) : (
             <>

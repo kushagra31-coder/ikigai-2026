@@ -91,6 +91,7 @@ export interface AdminTeam {
   id: string;
   name: string;
   trackId?: string;
+  mentorId?: string;
   membersCount: number;
   submissionStatus: 'NOT_STARTED' | 'DRAFT' | 'SUBMITTED';
   isLocked: boolean;

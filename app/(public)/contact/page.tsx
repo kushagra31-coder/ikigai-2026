@@ -1,110 +1,84 @@
-import { Container, Section, Grid, Flex, Stack } from '@/components/layout';
+'use client';
+
+import { Container } from '@/components/layout';
 import { PUBLIC_CONTENT } from '@/components/constants/public-content';
-import { Fade, Slide } from '@/components/motion';
-import { GlassCard } from '@/components/data-display/GlassCard';
-import { Icons } from '@/components/constants/icons';
 import { Button } from '@/components/primitives/button';
 
-export const metadata = {
-  title: 'Contact | IKIGAI 2026',
-  description: 'Get in touch with the IKIGAI 2026 team.',
-};
-
 export default function ContactPage() {
+  const { contact } = PUBLIC_CONTENT;
+
   return (
-    <Section className="pt-32 min-h-screen">
-      <Container className="max-w-5xl">
-        <Fade>
-          <div className="text-center mb-16 space-y-4">
-            <h1 className="text-display font-bold">Get in Touch</h1>
-            <p className="text-body-l text-muted-foreground">
-              Have questions? We&apos;re here to help.
+    <div className="min-h-screen bg-background text-foreground mt-20">
+      <div className="bg-foreground text-background py-32 border-b border-border">
+        <Container>
+          <div className="max-w-4xl">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-background/50 mb-8 flex items-center gap-4">
+              <span className="w-12 h-px bg-background/20" />
+              Support & Inquiries
+            </div>
+            <h1 className="text-6xl md:text-8xl font-semibold tracking-tighter mb-8 leading-[0.9]">Contact<br/>Operations</h1>
+            <p className="text-2xl text-background/70 font-light leading-relaxed max-w-2xl">
+              Direct line to the competition management team. Expect a response within 24 hours.
             </p>
           </div>
-        </Fade>
+        </Container>
+      </div>
 
-        <Grid className="grid-cols-1 lg:grid-cols-2 gap-12">
-          <Slide direction="right">
-            <Stack className="space-y-6">
-              <GlassCard className="p-8">
-                <h3 className="text-heading-m mb-6 border-b border-white/10 pb-4">Contact Information</h3>
-                <Stack className="space-y-4">
-                  <Flex className="gap-4 text-muted-foreground">
-                    <Icons.mail className="w-5 h-5 text-primary" />
-                    <a href={`mailto:${PUBLIC_CONTENT.contact.email}`} className="hover:text-primary transition-colors">
-                      {PUBLIC_CONTENT.contact.email}
-                    </a>
-                  </Flex>
-                  <Flex className="gap-4 text-muted-foreground">
-                    <Icons.phone className="w-5 h-5 text-primary" />
-                    <span>{PUBLIC_CONTENT.contact.phone}</span>
-                  </Flex>
-                  <Flex className="gap-4 text-muted-foreground items-start">
-                    <Icons.mapPin className="w-5 h-5 text-primary shrink-0 mt-1" />
-                    <span>
-                      {PUBLIC_CONTENT.about.organizer}<br />
-                      {PUBLIC_CONTENT.about.venue}
-                    </span>
-                  </Flex>
-                </Stack>
-              </GlassCard>
+      <Container className="py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-24">
+          
+          <div className="flex flex-col gap-16">
+            <div>
+              <h2 className="text-3xl font-semibold tracking-tighter mb-8 border-b border-border pb-4">Direct Channels</h2>
+              <div className="flex flex-col gap-8">
+                <div>
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Email Routing</div>
+                  <a href={`mailto:${contact.email}`} className="text-2xl font-semibold hover:text-primary transition-colors">{contact.email}</a>
+                </div>
+                <div>
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Emergency Phone</div>
+                  <a href={`tel:${contact.phone}`} className="text-2xl font-semibold hover:text-primary transition-colors">{contact.phone}</a>
+                </div>
+              </div>
+            </div>
 
-              <GlassCard className="p-8">
-                <h3 className="text-heading-m mb-6 border-b border-white/10 pb-4">Coordinators</h3>
-                <Grid className="grid-cols-2 gap-6">
-                  <div>
-                    <span className="text-sm text-secondary uppercase font-bold tracking-wider mb-2 block">Faculty</span>
-                    <ul className="text-muted-foreground space-y-1">
-                      {PUBLIC_CONTENT.contact.facultyCoords.map((name, i) => (
-                        <li key={i}>{name}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <span className="text-sm text-secondary uppercase font-bold tracking-wider mb-2 block">Students</span>
-                    <ul className="text-muted-foreground space-y-1">
-                      {PUBLIC_CONTENT.contact.studentCoords.map((name, i) => (
-                        <li key={i}>{name}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </Grid>
-              </GlassCard>
+            <div className="bg-muted/10 border border-border p-8">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-primary mb-4">Response Protocol</div>
+              <ul className="text-sm text-muted-foreground flex flex-col gap-2">
+                <li>• General Inquiries: 24h SLA</li>
+                <li>• Technical Support: 12h SLA</li>
+                <li>• Emergency Reports: Immediate routing</li>
+              </ul>
+            </div>
+          </div>
 
-              <Flex className="gap-4 pt-4">
-                <Button asChild variant="outline" size="icon" className="rounded-full w-12 h-12">
-                  <a href={PUBLIC_CONTENT.contact.socialLinks.instagram} target="_blank" rel="noreferrer">
-                    <Icons.instagram className="w-5 h-5" />
-                  </a>
-                </Button>
-                <Button asChild variant="outline" size="icon" className="rounded-full w-12 h-12">
-                  <a href={PUBLIC_CONTENT.contact.socialLinks.linkedin} target="_blank" rel="noreferrer">
-                    <Icons.linkedin className="w-5 h-5" />
-                  </a>
-                </Button>
-                <Button asChild variant="outline" size="icon" className="rounded-full w-12 h-12">
-                  <a href={PUBLIC_CONTENT.contact.socialLinks.github} target="_blank" rel="noreferrer">
-                    <Icons.github className="w-5 h-5" />
-                  </a>
-                </Button>
-              </Flex>
-            </Stack>
-          </Slide>
+          <div>
+            <h2 className="text-3xl font-semibold tracking-tighter mb-8 border-b border-border pb-4">Submit Ticket</h2>
+            <form className="flex flex-col gap-6" onSubmit={(e) => e.preventDefault()}>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Name</label>
+                  <input type="text" className="w-full bg-transparent border border-border p-4 text-sm focus:outline-none focus:border-primary transition-colors" placeholder="John Doe" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Email</label>
+                  <input type="email" className="w-full bg-transparent border border-border p-4 text-sm focus:outline-none focus:border-primary transition-colors" placeholder="john@example.com" />
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Subject</label>
+                <input type="text" className="w-full bg-transparent border border-border p-4 text-sm focus:outline-none focus:border-primary transition-colors" placeholder="Regarding submission error..." />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Message</label>
+                <textarea rows={6} className="w-full bg-transparent border border-border p-4 text-sm focus:outline-none focus:border-primary transition-colors resize-none" placeholder="Please describe the issue in detail." />
+              </div>
+              <Button type="submit" size="lg" className="w-full h-14 rounded-none uppercase tracking-widest text-xs font-bold">Transmit Message</Button>
+            </form>
+          </div>
 
-          <Slide direction="up" delay={0.2}>
-            <GlassCard className="p-2 min-h-[400px] overflow-hidden group">
-              {/* Maps Iframe */}
-              <iframe 
-                className="w-full h-[400px] rounded-xl"
-                style={{ border: 0 }}
-                loading="lazy" 
-                allowFullScreen 
-                src="https://www.openstreetmap.org/export/embed.html?bbox=75.924%2C22.814%2C75.952%2C22.826&amp;layer=mapnik&amp;marker=22.8218%2C75.9437"
-              ></iframe>
-            </GlassCard>
-          </Slide>
-        </Grid>
+        </div>
       </Container>
-    </Section>
+    </div>
   );
 }

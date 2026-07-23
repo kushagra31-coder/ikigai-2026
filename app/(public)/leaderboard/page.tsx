@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient as supabase } from '@/lib/supabase/client';
 import { Icons } from '@/components/constants/icons';
-import { Card } from '@/components/primitives/card';
+import { Button } from '@/components/primitives/button';
 import IKIGAI2026_CONFIG from '@/config/event.config';
 
-// Types for our local mapping
 type LeaderboardTeam = {
   id: string;
   rank: number;
@@ -15,21 +14,36 @@ type LeaderboardTeam = {
   college_name: string;
   track_name: string;
   avg_total: number;
+  evaluation_count: number;
   latest_feedback: string | null;
+  score_change: number; 
+  github?: string | null;
+  presentation?: string | null;
+  members?: { name: string; certificateId: string }[];
+  mentor_name?: string;
+};
+
+const TRACK_MENTORS: Record<string, string> = {
+  "sports-tech": "Dr. Aditi Sharma",
+  "agri-tech": "Prof. R. K. Singh",
+  "cyber-security": "Dr. Vivek Kumar",
+  "ai-frontiers": "Prof. S. N. Joshi",
+  "climate-tech": "Dr. Priya Patel"
 };
 
 export default function LeaderboardPage() {
   const [teams, setTeams] = useState<LeaderboardTeam[]>([]);
   const [tracks, setTracks] = useState<string[]>(['All Tracks']);
   const [activeTrack, setActiveTrack] = useState('All Tracks');
+  const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [mode, setMode] = useState<'hidden' | 'live' | 'final'>('live'); // Defaulting to live for now
+  const [mode, setMode] = useState<'hidden' | 'live' | 'final'>('live');
+  const [selectedTeam, setSelectedTeam] = useState<LeaderboardTeam | null>(null);
 
   useEffect(() => {
     fetchLeaderboard();
     fetchLeaderboardMode();
     
-    // Subscribe to evaluations table for real-time updates
     const channel = supabase()
       .channel('schema-db-changes')
       .on(
@@ -58,18 +72,12 @@ export default function LeaderboardPage() {
 
   const fetchLeaderboard = async () => {
     setIsLoading(true);
-    // Fetch teams, submissions, and evaluations
-    // Note: Since we don't have a public_leaderboard view yet, we compute it here.
-    const { data: teamsData } = await supabase().from('teams').select('id, name, tracks(name)');
-    const { data: submissionsData } = await supabase().from('submissions').select('id, team_id');
-    const { data: evalsData } = await supabase().from('evaluations').select('submission_id, total_score, feedback, updated_at');
+    
+    try {
+      const res = await fetch('/api/leaderboard');
+      if (!res.ok) throw new Error('Failed to fetch data');
+      const { teams: teamsData, submissions: submissionsData, evaluations: evalsData }: { teams: any[], submissions: any[], evaluations: any[] } = await res.json();
 
-    if (!teamsData || !submissionsData || !evalsData) {
-      setIsLoading(false);
-      return;
-    }
-
-    // Map evaluations to teams
     const teamScores = new Map<string, { total: number; count: number; latest_feedback: string | null; last_updated: Date | null }>();
     evalsData.forEach((ev) => {
       if (ev.total_score === null) return;
@@ -95,55 +103,33 @@ export default function LeaderboardPage() {
       });
     });
 
-    // Fetch valid teams from certificates.json
-    let certTeams: string[] = [];
-    try {
-      const certRes = await fetch('/certificates.json');
-      if (certRes.ok) {
-        const certData = await certRes.json();
-        const teamsSet = new Set<string>();
-        certData.forEach((c: any) => {
-          if (c.team && c.team.trim() !== '') {
-            teamsSet.add(c.team.trim());
-          }
-        });
-        certTeams = Array.from(teamsSet);
-      }
-    } catch (e) {
-      console.error("Failed to load certificates.json", e);
-    }
-
     let leaderboard: LeaderboardTeam[] = teamsData.map((t) => {
       const scoreData = teamScores.get(t.id) || { total: 0, count: 0, latest_feedback: null, last_updated: null };
       const avg = scoreData.count > 0 ? Number((scoreData.total / scoreData.count).toFixed(2)) : 0;
+      const sub = submissionsData.find(s => s.team_id === t.id);
+
+      const trackData = Array.isArray(t.tracks) ? t.tracks[0] : (t.tracks as any);
+      const trackName = trackData?.name || 'Unknown';
+      const trackId = trackData?.id || 'unknown';
+      const mentorName = TRACK_MENTORS[trackId] || 'Expert Panel';
+
       return {
         id: t.id,
-        rank: 0, // calculated after sort
+        rank: 0,
         team_name: t.name,
-        college_name: 'CSIT-AITR', // Placeholder
-        track_name: (Array.isArray(t.tracks) ? t.tracks[0]?.name : (t.tracks as any)?.name) || 'Unknown',
+        college_name: 'IKIGAI 2026',
+        track_name: trackName,
         avg_total: avg,
+        evaluation_count: scoreData.count,
         latest_feedback: scoreData.latest_feedback,
+        score_change: 0,
+        github: t.repository_url,
+        presentation: sub?.presentation_url,
+        members: [],
+        mentor_name: mentorName
       };
     });
 
-    // Add missing teams from certificates.json as virtual teams with 0 score
-    const existingDbNames = new Set(leaderboard.map(t => t.team_name.trim().toLowerCase()));
-    const virtualTeams = certTeams
-      .filter(name => !existingDbNames.has(name.toLowerCase()))
-      .map((name, idx) => ({
-        id: `virtual-${idx}`,
-        rank: 0,
-        team_name: name,
-        college_name: 'Unknown',
-        track_name: 'All Tracks',
-        avg_total: 0,
-        latest_feedback: null,
-      }));
-
-    leaderboard = [...leaderboard, ...virtualTeams];
-
-    // Sort by avg score
     leaderboard.sort((a, b) => b.avg_total - a.avg_total);
     leaderboard.forEach((t, i) => (t.rank = i + 1));
 
@@ -153,211 +139,328 @@ export default function LeaderboardPage() {
     setTracks(uniqueTracks);
     setTeams(leaderboard);
     setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+    }
   };
 
-  const filteredTeams = activeTrack === 'All Tracks' ? teams : teams.filter((t) => t.track_name === activeTrack);
+  const filteredTeams = useMemo(() => {
+    let result = activeTrack === 'All Tracks' ? teams : teams.filter((t) => t.track_name === activeTrack);
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(t => t.team_name.toLowerCase().includes(q) || t.college_name.toLowerCase().includes(q));
+    }
+    return result;
+  }, [teams, activeTrack, searchQuery]);
+
   const top3 = filteredTeams.slice(0, 3);
   const rest = filteredTeams.slice(3);
 
   if (mode === 'hidden') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4 text-center">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-          <Icons.clock className="w-16 h-16 mx-auto text-primary animate-pulse" />
-          <h1 className="text-3xl font-bold tracking-tight">Results Pending</h1>
-          <p className="text-muted-foreground max-w-md">The leaderboard will go live once judging is complete. This page refreshes automatically.</p>
-        </motion.div>
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+        <div className="text-center">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4">Telemetry Offline</div>
+          <h1 className="text-5xl font-semibold tracking-tighter mb-4">Results Pending</h1>
+          <p className="text-muted-foreground">The leaderboard will go live once evaluations are complete.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-12 px-4 md:px-8">
-      <div className="max-w-6xl mx-auto space-y-12">
-        {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Live Leaderboard</h1>
-            <p className="text-muted-foreground">Real-time team rankings and scores</p>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* ─── HERO & STATS ─── */}
+      <section className="pt-32 pb-16 px-6 lg:px-12 border-b border-border/50 bg-background text-foreground">
+        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-12">
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <span className="w-2 h-2 bg-primary animate-pulse" />
+              <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-500">Live Telemetry Active</span>
+            </div>
+            <h1 className="text-6xl md:text-8xl font-semibold tracking-tighter leading-[0.9]">Standings</h1>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full font-bold uppercase tracking-widest text-sm border border-primary/20">
-            {mode === 'live' ? (
-              <><span className="w-2 h-2 rounded-full bg-primary animate-pulse" /> LIVE</>
+          
+          <div className="flex gap-12">
+            <div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Evaluated</div>
+              <div className="text-3xl font-semibold tracking-tight">{teams.filter(t => t.avg_total > 0).length} / {teams.length}</div>
+            </div>
+            <div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">High Score</div>
+              <div className="text-3xl font-semibold tracking-tight text-cyan-500 font-mono">{top3[0]?.avg_total.toFixed(1) || "0.0"}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-12 xl:gap-24">
+          
+          {/* Main Content Area */}
+          <div className="xl:col-span-8 flex flex-col">
+            
+            {/* ─── PODIUM ─── */}
+            {!isLoading && top3.length > 0 && !searchQuery && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-y border-border/50 mb-16">
+                <PodiumColumn team={top3[1]} place={2} onClick={() => setSelectedTeam(top3[1])} />
+                <PodiumColumn team={top3[0]} place={1} onClick={() => setSelectedTeam(top3[0])} />
+                <PodiumColumn team={top3[2]} place={3} onClick={() => setSelectedTeam(top3[2])} />
+              </div>
+            )}
+
+            {/* ─── FILTERS ─── */}
+            <div className="sticky top-0 z-40 bg-background/90 backdrop-blur-xl border-b border-border/50 py-4 mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div className="flex flex-wrap gap-2">
+                {tracks.map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setActiveTrack(t)}
+                    className={`px-4 py-2 text-[10px] font-mono uppercase tracking-widest border transition-colors duration-150 ${
+                      activeTrack === t 
+                        ? 'border-foreground bg-background text-foreground' 
+                        : 'border-border/50 bg-transparent text-muted-foreground hover:border-cyan-500/50 hover:text-cyan-500 hover:bg-cyan-500/5'
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+              <div className="relative w-full md:w-64">
+                <Icons.search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input 
+                  type="text" 
+                  placeholder="Search telemetry..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-transparent border border-border/50 px-10 py-2 text-xs font-mono focus:outline-none focus:border-primary transition-colors duration-150 text-foreground"
+                />
+              </div>
+            </div>
+
+            {/* ─── LIVE RANKINGS TABLE ─── */}
+            {isLoading ? (
+              <div className="animate-pulse space-y-px bg-border/30 rounded-2xl overflow-hidden backdrop-blur-md shadow-2xl">
+                {[...Array(10)].map((_, i) => (
+                  <div key={i} className="h-16 bg-background" />
+                ))}
+              </div>
+            ) : filteredTeams.length === 0 ? (
+              <div className="py-24 text-center border border-border/50 text-muted-foreground font-mono text-sm">
+                No active telemetry found.
+              </div>
             ) : (
-              <><Icons.trophy className="w-4 h-4" /> FINAL RESULTS</>
+              <div className="flex flex-col border border-border/50 bg-border/30 rounded-2xl overflow-hidden backdrop-blur-md shadow-2xl gap-px">
+                {/* Table Header */}
+                <div className="grid grid-cols-12 gap-4 bg-muted/5 border-b border-border/50/50 px-4 py-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  <div className="col-span-1">Pos</div>
+                  <div className="col-span-1 text-center">Trend</div>
+                  <div className="col-span-5">Identity</div>
+                  <div className="col-span-3">Domain</div>
+                  <div className="col-span-2 text-right">Score</div>
+                </div>
+
+                <AnimatePresence>
+                  {(searchQuery ? filteredTeams : rest).map((team) => (
+                    <motion.div 
+                      layout
+                      key={team.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      onClick={() => setSelectedTeam(team)}
+                      className="grid grid-cols-12 gap-4 bg-background/20 hover:bg-cyan-500/5 hover:border-cyan-500/20 px-4 py-4 items-center group transition-colors duration-150 cursor-pointer"
+                    >
+                      <div className="col-span-1 font-mono text-sm font-semibold text-muted-foreground group-hover:text-cyan-500 transition-colors duration-150">
+                        {String(team.rank).padStart(2, '0')}
+                      </div>
+                      <div className="col-span-1 flex justify-center">
+                        {team.score_change > 0 ? (
+                          <Icons.trendingUp className="w-4 h-4 text-cyan-500" />
+                        ) : team.score_change < 0 ? (
+                          <Icons.trendingDown className="w-4 h-4 text-red-500" />
+                        ) : (
+                          <Icons.minus className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </div>
+                      <div className="col-span-5 flex flex-col">
+                        <span className="font-semibold text-base tracking-tight">{team.team_name}</span>
+                        <span className="text-[10px] font-mono text-muted-foreground">{team.college_name}</span>
+                      </div>
+                      <div className="col-span-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                        {team.track_name}
+                      </div>
+                      <div className="col-span-2 text-right font-mono font-bold text-lg">
+                        {team.avg_total.toFixed(1)}
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
             )}
           </div>
-        </header>
 
-        {/* Filters */}
-        <div className="flex flex-wrap gap-2">
-          {tracks.map((t) => (
-            <button
-              key={t}
-              onClick={() => setActiveTrack(t)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeTrack === t 
-                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' 
-                  : 'bg-card border border-white/10 hover:bg-white/5 text-muted-foreground'
-              }`}
-            >
-              {t}
-            </button>
-          ))}
+          <div className="xl:col-span-4 flex flex-col gap-12">
+            {/* Pinned Current Team */}
+            <div>
+              <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4 border-b border-border/50 pb-2">Your Telemetry</h3>
+              <div className="border border-border/50 p-6 bg-muted/10 flex flex-col items-center justify-center text-center min-h-[150px]">
+                <Icons.user className="w-6 h-6 text-muted-foreground mb-4" />
+                <div className="text-sm font-medium tracking-tight mb-2">Unidentified User</div>
+                <div className="text-xs text-muted-foreground">Authenticate to view your team's live standing.</div>
+              </div>
+            </div>
+
+            {/* Activity Feed */}
+            <div>
+              <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4 border-b border-border/50 pb-2">Live Activity Stream</h3>
+              <div className="flex flex-col border border-border/50 bg-muted/5 items-center justify-center text-center min-h-[200px] p-6">
+                 <Icons.activity className="w-6 h-6 text-muted-foreground mb-4 opacity-50" />
+                 <div className="text-sm text-muted-foreground font-mono">Stream empty. Awaiting judge evaluations...</div>
+              </div>
+            </div>
+
+          </div>
         </div>
+      </div>
 
-        {/* Podium */}
-        {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <Icons.spinner className="w-8 h-8 animate-spin text-primary" />
-          </div>
-        ) : filteredTeams.length === 0 ? (
-          <div className="text-center py-20 text-muted-foreground">
-            <Icons.activity className="w-12 h-12 mx-auto mb-4 opacity-20" />
-            <p>No scored teams yet for this track.</p>
-          </div>
-        ) : (
-          <div className="space-y-16">
-              <div className="flex flex-col md:flex-row items-end justify-center gap-4 md:gap-8 pt-12 pb-8">
-                {/* 2nd Place */}
-                {filteredTeams.length > 1 && (
-                  <PodiumCard team={filteredTeams[1]} place={2} />
-                )}
-                
-                {/* 1st Place */}
-                {filteredTeams.length > 0 && (
-                  <PodiumCard team={filteredTeams[0]} place={1} />
-                )}
-                
-                {/* 3rd Place */}
-                {filteredTeams.length > 2 && (
-                  <PodiumCard team={filteredTeams[2]} place={3} />
-                )}
+      {/* TEAM DETAILS DRAWER */}
+      <AnimatePresence>
+        {selectedTeam && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedTeam(null)}
+              className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 cursor-pointer"
+            />
+            <motion.div 
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 bottom-0 w-full max-w-lg bg-background border-l border-border/50 z-50 flex flex-col shadow-2xl"
+            >
+              <div className="flex items-center justify-between p-6 border-b border-border/50">
+                <div>
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1">Team Identity</div>
+                  <h2 className="text-2xl font-semibold tracking-tight">{selectedTeam.team_name}</h2>
+                </div>
+                <button 
+                  onClick={() => setSelectedTeam(null)}
+                  className="p-2 hover:bg-muted/10 transition-colors duration-150 rounded"
+                >
+                  <Icons.close className="w-5 h-5 text-muted-foreground" />
+                </button>
               </div>
 
-            {/* All Teams Table */}
-            {filteredTeams.length > 0 && (
-              <Card className="p-0 overflow-hidden bg-card/50 border-white/5 backdrop-blur-sm mt-8">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="border-b border-white/10 bg-black/40">
-                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-12">#</th>
-                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Team</th>
-                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">College</th>
-                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Track</th>
-                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Mentor Feedback</th>
-                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right w-32">Score / 40</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                      {filteredTeams.map((team, index) => (
-                        <motion.tr 
-                          key={team.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className={`group hover:bg-white/5 transition-colors ${
-                            team.rank === 1 ? 'bg-amber-500/5' :
-                            team.rank === 2 ? 'bg-gray-300/5' :
-                            team.rank === 3 ? 'bg-orange-800/5' : ''
-                          }`}
-                        >
-                          <td className="px-6 py-4">
-                            <span className="font-mono text-muted-foreground">{team.rank}</span>
-                          </td>
-                          <td className="px-6 py-4 font-bold text-foreground">{team.team_name}</td>
-                          <td className="px-6 py-4 text-muted-foreground text-sm hidden md:table-cell">{team.college_name}</td>
-                          <td className="px-6 py-4 hidden lg:table-cell">
-                            <span className="inline-flex items-center px-2 py-1 rounded-md bg-white/5 text-xs text-muted-foreground border border-white/10">
-                              {team.track_name}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            {team.latest_feedback ? (
-                              <span className="text-sm text-muted-foreground line-clamp-2 max-w-[200px] italic">
-                                &quot;{team.latest_feedback}&quot;
-                              </span>
-                            ) : (
-                              <span className="text-xs text-white/20">-</span>
-                            )}
-                          </td>
-                          <td className="px-6 py-4 text-right">
-                            <div className="flex items-center justify-end gap-3">
-                              <div className="w-24 h-1.5 bg-black/40 rounded-full overflow-hidden hidden sm:block">
-                                <div 
-                                  className="h-full bg-primary rounded-full" 
-                                  style={{ width: `${Math.min(100, (team.avg_total / 40) * 100)}%` }}
-                                />
-                              </div>
-                              <span className="font-mono font-bold text-lg">{team.avg_total.toFixed(1)}</span>
-                            </div>
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </tbody>
-                  </table>
+              <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-12">
+                
+                {/* Key Metrics */}
+                <div className="grid grid-cols-2 gap-px bg-border/30 rounded-2xl overflow-hidden backdrop-blur-md shadow-2xl border border-border/50">
+                  <div className="bg-background p-6 flex flex-col justify-center">
+                    <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Track & Mentor</div>
+                    <div className="text-sm font-semibold truncate mb-1">{selectedTeam.track_name}</div>
+                    <div className="text-[10px] font-mono text-cyan-500">Mentor: {selectedTeam.mentor_name}</div>
+                  </div>
+                  <div className="bg-background p-6 flex flex-col justify-center">
+                    <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Average Score</div>
+                    <div className="text-3xl font-mono font-bold text-cyan-500">{selectedTeam.avg_total.toFixed(1)}</div>
+                  </div>
                 </div>
-              </Card>
-            )}
-          </div>
+
+
+
+                {/* Judge Progress Simulation */}
+                <div>
+                  <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4 border-b border-border/50 pb-2">Judgement Progress</h3>
+                  <div className="flex flex-col gap-px bg-border/30 rounded-2xl overflow-hidden backdrop-blur-md shadow-2xl border border-border/50">
+                    {selectedTeam.evaluation_count > 0 ? (
+                      Array.from({ length: selectedTeam.evaluation_count }).map((_, idx) => (
+                        <div key={idx} className="flex justify-between items-center p-4 bg-background border-b border-border/50 last:border-b-0">
+                          <span className="text-sm font-medium">Evaluation {idx + 1}</span>
+                          <div className="flex items-center gap-2 text-cyan-500">
+                            <Icons.check className="w-4 h-4" />
+                            <span className="text-[10px] font-mono uppercase tracking-widest">Recorded</span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 bg-background text-center flex flex-col items-center justify-center gap-2">
+                        <Icons.clock className="w-4 h-4 text-muted-foreground opacity-50" />
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">No evaluations yet</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Latest Feedback */}
+                <div>
+                  <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4 border-b border-border/50 pb-2">Latest Feedback</h3>
+                  {selectedTeam.latest_feedback ? (
+                    <div className="p-6 bg-muted/5 border border-border/50 text-sm leading-relaxed text-muted-foreground">
+                      {selectedTeam.latest_feedback}
+                    </div>
+                  ) : (
+                    <div className="p-6 bg-muted/5 border border-border/50 text-sm font-mono text-muted-foreground text-center">
+                      No feedback recorded yet.
+                    </div>
+                  )}
+                </div>
+
+              </div>
+            </motion.div>
+          </>
         )}
-      </div>
+      </AnimatePresence>
     </div>
   );
 }
 
-function PodiumCard({ team, place }: { team: LeaderboardTeam; place: 1 | 2 | 3 }) {
+function PodiumColumn({ team, place, onClick }: { team?: LeaderboardTeam; place: 1 | 2 | 3; onClick?: () => void }) {
   const isFirst = place === 1;
-  const heights = {
-    1: 'h-64 sm:h-72',
-    2: 'h-52 sm:h-60',
-    3: 'h-48 sm:h-52'
-  };
-  
-  const colors = {
-    1: 'from-amber-500/20 to-amber-500/5 border-amber-500/30',
-    2: 'from-slate-300/20 to-slate-300/5 border-slate-300/30',
-    3: 'from-orange-800/20 to-orange-800/5 border-orange-800/30'
-  };
+  const placeLabels = { 1: 'P1', 2: 'P2', 3: 'P3' };
 
-  const medals = {
-    1: '🏆',
-    2: '🥈',
-    3: '🥉'
-  };
-
-  return (
-    <motion.div 
-      layout
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`relative flex flex-col items-center w-full max-w-[280px] order-${place === 2 ? 1 : place === 1 ? 2 : 3} ${isFirst ? 'z-30' : place === 2 ? 'z-20' : 'z-10'}`}
-    >
-      <div className={`w-full bg-gradient-to-b ${colors[place]} border rounded-2xl flex flex-col items-center p-6 text-center backdrop-blur-md relative ${heights[place]} justify-end transition-transform hover:scale-[1.02] duration-300`}>
-        <div className={`absolute -top-8 bg-background/50 backdrop-blur-xl rounded-full p-3 border ${isFirst ? 'scale-125 border-amber-500/50 shadow-[0_0_30px_rgba(245,158,11,0.3)]' : 'border-white/20'}`}>
-          <span className="text-3xl" aria-hidden="true">{medals[place]}</span>
+  if (!team) {
+    return (
+      <div className={`flex flex-col p-8 border-b md:border-b-0 md:border-r border-border/50 last:border-r-0 ${isFirst ? 'bg-cyan-500/5 shadow-[inset_0_0_0_1px_rgba(6,182,212,0.1)]' : ''}`}>
+        <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4 flex justify-between items-center">
+          <span>Rank</span>
+          <span className={isFirst ? 'text-cyan-500 font-bold' : ''}>{placeLabels[place]}</span>
         </div>
-        
-        <div className="mb-auto mt-4 w-full">
-          <h3 className="font-bold text-lg sm:text-xl line-clamp-2 text-foreground mb-1 drop-shadow-md">
-            {team.team_name}
-          </h3>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">
-            {place === 1 ? '1st Place' : place === 2 ? '2nd Place' : '3rd Place'}
-          </p>
-          <div className="inline-block px-2.5 py-1 rounded-md bg-black/40 text-[10px] text-muted-foreground border border-white/5">
-            {team.track_name}
-          </div>
-        </div>
-
-        <div className="mt-4 pt-4 border-t border-white/10 w-full">
-          <div className="text-3xl sm:text-4xl font-mono font-bold text-foreground drop-shadow-lg">
-            {team.avg_total.toFixed(1)}
-            <span className="text-sm text-muted-foreground font-sans ml-1">/40</span>
+        <div className="text-3xl font-semibold tracking-tight mb-2 opacity-20">TBD</div>
+        <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-12 opacity-20">Pending</div>
+        <div className="mt-auto pt-8 border-t border-border/50">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1 opacity-20">Score</div>
+          <div className={`text-5xl font-mono font-bold tracking-tighter opacity-20 ${isFirst ? 'text-cyan-500' : 'text-foreground'}`}>
+            --
           </div>
         </div>
       </div>
-    </motion.div>
+    );
+  }
+
+  return (
+    <div 
+      onClick={onClick}
+      className={`group cursor-pointer flex flex-col p-8 border-b md:border-b-0 md:border-r border-border/50 last:border-r-0 transition-colors duration-150 ${isFirst ? 'bg-cyan-500/5 hover:bg-cyan-500/10 shadow-[inset_0_0_0_1px_rgba(6,182,212,0.1)] hover:shadow-[0_0_30px_rgba(6,182,212,0.15)] relative overflow-hidden' : 'hover:bg-muted/10'}`}
+    >
+      <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4 flex justify-between items-center group-hover:text-cyan-500 transition-colors duration-150">
+        <span>Rank</span>
+        <span className={isFirst ? 'text-cyan-500 font-bold' : ''}>{placeLabels[place]}</span>
+      </div>
+      <div className="text-3xl font-semibold tracking-tight mb-2 line-clamp-1">{team.team_name}</div>
+      <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-12">{team.track_name}</div>
+      
+      <div className="mt-auto pt-8 border-t border-border/50">
+        <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1">Score</div>
+        <div className={`text-5xl font-mono font-bold tracking-tighter ${isFirst ? 'text-cyan-500' : 'text-foreground'}`}>
+          {team.avg_total.toFixed(1)}
+        </div>
+      </div>
+    </div>
   );
 }

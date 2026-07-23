@@ -7,11 +7,3 @@ export function useAssignedTeams() {
     queryFn: () => MentorService.getAssignedTeams(),
   });
 }
-
-export function useTeamDetails(teamId: string) {
-  return useQuery({
-    queryKey: ['teamDetails', teamId],
-    queryFn: () => MentorService.getTeamDetails(teamId),
-    enabled: !!teamId,
-  });
-}

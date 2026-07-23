@@ -103,7 +103,7 @@ export default function BulkImportPage() {
             </label>
           </div>
           {file && (
-            <p className="text-sm mt-4 text-emerald-400 font-medium">
+            <p className="text-sm mt-4 text-success font-medium">
               Selected: {file.name}
             </p>
           )}

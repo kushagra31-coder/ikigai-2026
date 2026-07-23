@@ -27,10 +27,13 @@ const TrackSchema = z.object({
 
 const SponsorSchema = z.object({
   name: z.string(),
+  shortName: z.string().optional(),
   logo: z.string(),
   website: z.string(),
   category: z.string(),
-  priority: z.number()
+  description: z.string().optional(),
+  priority: z.number().optional(),
+  color: z.string().optional()
 });
 
 const DownloadSchema = z.object({
@@ -87,12 +90,7 @@ export const IKIGAI2026_CONFIG = {
 // 3. Validate at runtime/build-time
 const validation = EventConfigSchema.safeParse(IKIGAI2026_CONFIG);
 if (!validation.success) {
-  console.error("❌ CRITICAL: Configuration validation failed!");
-  console.error(validation.error.format());
-  if (typeof process !== "undefined" && process.env.NODE_ENV !== "test") {
-    // Fail build if config is invalid, except in test runners if desired
-    process.exit(1);
-  }
+  throw new Error("Configuration validation failed! Details: " + JSON.stringify(validation.error.format(), null, 2));
 }
 
 // 4. Export as EVENT_CONFIG for backward compatibility with existing codebase

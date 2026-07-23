@@ -10,22 +10,25 @@ export class SupabaseTeamsRepository extends BaseRepository<AdminTeam, 'teams'> 
     super(client, 'teams');
   }
 
-  protected mapRowToModel(row: Database['public']['Tables']['teams']['Row']): AdminTeam {
+  protected mapRowToModel(row: any): AdminTeam {
     return {
       id: row.id,
       name: row.name,
-      trackId: row.track_id || undefined,
-      mentorId: 'unassigned', // Not in DB
-      membersCount: 0, // Should be joined
-      submissionStatus: 'DRAFT', // Should be joined
+      trackId: row.tracks?.name || row.track_id || undefined,
+      mentorId: 'unassigned',
+      membersCount: row.team_members?.length || 0,
+      submissionStatus: (Array.isArray(row.submissions) ? row.submissions[0]?.status : row.submissions?.status) || 'DRAFT',
       isLocked: row.is_locked,
     };
   }
 
-  // Override getTeams to use mapRowToModel
+  // Override getTeams to use mapRowToModel with joins
   async getTeams(): Promise<Result<AdminTeam[]>> {
-    const query = this.supabase.from(this.tableName).select('*') as unknown as PromiseLike<{ data: Database['public']['Tables']['teams']['Row'][] | null; error: unknown }>;
-    const result = await this.executeQuery<Database['public']['Tables']['teams']['Row'][]>(query, 'teams.getTeams');
+    const query = this.supabase
+      .from(this.tableName)
+      .select('*, tracks(id, name), submissions(status), team_members(id)') as any;
+      
+    const result = await this.executeQuery<any[]>(query, 'teams.getTeams');
     
     if (!result.success) return result;
 

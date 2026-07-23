@@ -41,7 +41,7 @@ export class SupabaseMentorsRepository extends BaseRepository<AdminMentor, 'prof
   async assignTrack(mentorId: string, trackId: string): Promise<Result<void>> {
     const query = this.supabase
       .from('profiles')
-      .update({ assigned_track_id: trackId })
+      .update({ assigned_track_id: trackId } as any)
       .eq('id', mentorId) as any;
     return this.executeQuery<void>(query, 'mentors.assignTrack');
   }
