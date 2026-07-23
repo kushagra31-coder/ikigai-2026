@@ -6,7 +6,6 @@ import { Button } from '@/components/primitives/button';
 import { useWorkspace } from '../context/WorkspaceContext';
 import { UserMenu } from './UserMenu';
 import { NotificationBell } from './NotificationBell';
-import { ThemeToggle } from '@/components/providers/ThemeToggle';
 
 export const Header = () => {
   const { openSidebar } = useWorkspace();
@@ -27,21 +26,7 @@ export const Header = () => {
       </div>
       
       <div className="flex items-center gap-3">
-        <button className="hidden sm:flex items-center px-3 py-1.5 bg-white/5 hover:bg-white/10 transition-colors rounded-md text-xs text-muted-foreground border border-white/5 cursor-pointer">
-          <Icons.search className="w-3.5 h-3.5 mr-2" />
-          <span>Search</span>
-          <div className="flex items-center gap-1 ml-4">
-            <kbd className="px-1.5 py-0.5 bg-background rounded-[4px] border border-white/10 font-mono text-[10px] font-semibold">Ctrl</kbd>
-            <kbd className="px-1.5 py-0.5 bg-background rounded-[4px] border border-white/10 font-mono text-[10px] font-semibold">K</kbd>
-          </div>
-        </button>
-        
-        <Button variant="ghost" size="icon" className="sm:hidden text-muted-foreground hover:text-foreground">
-          <Icons.search className="h-4 w-4" />
-        </Button>
-        
         <div className="flex items-center gap-1 pl-2 border-l border-white/10 ml-2">
-          <ThemeToggle />
           <NotificationBell />
           <UserMenu />
         </div>

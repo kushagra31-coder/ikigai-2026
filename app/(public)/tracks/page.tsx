@@ -200,7 +200,7 @@ export default function TracksPage() {
                       <div className="p-6 border-b border-border flex justify-between items-center bg-background">
                         <div>
                           <h3 className="text-sm font-semibold uppercase tracking-widest text-foreground font-mono">
-                            Assigned Teams
+                            Track Leaderboard
                           </h3>
                           {!isLoading && (
                             <div className="text-[10px] font-mono text-muted-foreground mt-1">
@@ -212,7 +212,7 @@ export default function TracksPage() {
                           href={`/leaderboard?track=${track.id}`}
                           className="text-[10px] font-mono uppercase tracking-widest text-primary hover:underline flex items-center gap-1"
                         >
-                          Leaderboard <Icons.arrowRight className="w-3 h-3" />
+                          Full Leaderboard <Icons.arrowRight className="w-3 h-3" />
                         </Link>
                       </div>
 
@@ -261,7 +261,7 @@ export default function TracksPage() {
                         ) : (
                           <div className="p-16 text-center">
                             <div className="text-sm font-mono text-muted-foreground mb-2">
-                              No teams assigned yet
+                              No teams evaluated yet
                             </div>
                             <div className="text-[10px] font-mono text-muted-foreground/50">
                               Teams will appear here once they register and are assigned to this track.

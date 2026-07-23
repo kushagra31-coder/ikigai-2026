@@ -62,16 +62,14 @@ export default function FAQPage() {
             {/* Result count badge */}
             {searchQuery && (
               <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                {faq.filter(
-                  (f) =>
-                    f.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    f.answer.toLowerCase().includes(searchQuery.toLowerCase())
-                ).length}{' '}
-                result{faq.filter(
-                  (f) =>
-                    f.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    f.answer.toLowerCase().includes(searchQuery.toLowerCase())
-                ).length !== 1 ? 's' : ''} found
+                {(() => {
+                  const tokens = searchQuery.toLowerCase().split(/\s+/).filter(Boolean);
+                  const count = faq.filter(f => {
+                    const text = `${f.question} ${f.answer}`.toLowerCase();
+                    return tokens.every(token => text.includes(token));
+                  }).length;
+                  return `${count} result${count !== 1 ? 's' : ''} found`;
+                })()}
               </div>
             )}
 

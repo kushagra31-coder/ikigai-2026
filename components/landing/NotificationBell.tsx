@@ -16,6 +16,7 @@ export function NotificationBell() {
       .from('announcements')
       .select('*')
       .eq('is_published', true)
+      .in('audience', ['ALL', 'PUBLIC'])
       .order('published_at', { ascending: false })
       .limit(5);
       
@@ -40,7 +41,7 @@ export function NotificationBell() {
         { event: 'INSERT', schema: 'public', table: 'announcements' },
         (payload) => {
           const newAnn = payload.new;
-          if (newAnn.is_published) {
+          if (newAnn.is_published && (newAnn.audience === 'ALL' || newAnn.audience === 'PUBLIC')) {
             setAnnouncements(prev => [newAnn, ...prev].slice(0, 5));
             setHasUnread(true);
             if (newAnn.priority === 'HIGH') {

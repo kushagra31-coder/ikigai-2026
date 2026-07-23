@@ -40,6 +40,8 @@ export default function MentorPage() {
   const [teams, setTeams] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [hasUnread, setHasUnread] = useState(false);
 
   const [selectedTeam, setSelectedTeam] = useState<any | null>(null);
   const [scores, setScores] = useState<ScoreMap>({ ...DEFAULT_SCORES });
@@ -63,15 +65,19 @@ export default function MentorPage() {
       mentorRepository.getAssignedTeams(),
       supabase()
         .from('announcements')
-        .select('id, title, content, created_at, priority')
+        .select('id, title, content, created_at, priority, audience')
         .eq('is_published', true)
+        .in('audience', ['ALL', 'MENTOR'])
         .order('created_at', { ascending: false })
         .limit(5),
     ]);
 
     if (profileResult.success) setProfile(profileResult.data);
     if (teamsResult.success) setTeams(teamsResult.data);
-    if (announcementsResp.data) setAnnouncements(announcementsResp.data);
+    if (announcementsResp.data) {
+      setAnnouncements(announcementsResp.data);
+      if (announcementsResp.data.length > 0) setHasUnread(true);
+    }
 
     setIsLoading(false);
   }, []);
@@ -91,8 +97,9 @@ export default function MentorPage() {
     const announcementChannel = supabase()
       .channel('mentor:announcements')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'announcements' }, (payload) => {
-        if (payload.new?.is_published) {
+        if (payload.new?.is_published && (payload.new?.audience === 'ALL' || payload.new?.audience === 'MENTOR')) {
           setAnnouncements(prev => [payload.new, ...prev].slice(0, 5));
+          setHasUnread(true);
         }
       })
       .subscribe();
@@ -189,7 +196,12 @@ export default function MentorPage() {
   const progress = teams.length > 0 ? Math.round((completed / teams.length) * 100) : 0;
 
   const filteredTeams = teams
-    .filter(t => t.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter(t => {
+      if (!searchQuery) return true;
+      const tokens = searchQuery.toLowerCase().split(/\s+/).filter(Boolean);
+      const text = `${t.name} ${t.trackName} ${t.evaluationStatus}`.toLowerCase();
+      return tokens.every(token => text.includes(token));
+    })
     .sort((a, b) => {
       // PENDING teams first, then COMPLETED
       if (a.evaluationStatus === 'PENDING' && b.evaluationStatus !== 'PENDING') return -1;
@@ -236,18 +248,7 @@ export default function MentorPage() {
         </div>
       )}
 
-      {/* Live Announcements Banner */}
-      {announcements.length > 0 && (
-        <div className="bg-primary/5 border-b border-primary/20 px-6 py-3 flex items-center gap-3 shrink-0">
-          <Icons.radio className="w-3.5 h-3.5 text-primary animate-pulse shrink-0" />
-          <div className="text-xs font-mono text-primary truncate">
-            <span className="font-bold uppercase tracking-widest mr-2">LIVE:</span>
-            {announcements[0].title} — {announcements[0].content}
-          </div>
-        </div>
-      )}
 
-      {/* Header */}
       <header className="px-6 py-4 border-b border-border shrink-0">
         <div className="flex flex-col md:flex-row justify-between gap-4">
           <div>
@@ -257,9 +258,53 @@ export default function MentorPage() {
                 Judge Panel Active
               </span>
             </div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {profile?.full_name || 'Mentor'}
-            </h1>
+            <div className="flex items-center gap-4">
+              <h1 className="text-2xl font-semibold tracking-tight">
+                {profile?.full_name || 'Mentor'}
+              </h1>
+              {/* Notification Bell */}
+              <div className="relative">
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="rounded-full w-8 h-8 relative"
+                  onClick={() => {
+                    setIsNotificationsOpen(!isNotificationsOpen);
+                    setHasUnread(false);
+                  }}
+                >
+                  <Icons.bell className="w-4 h-4" />
+                  {hasUnread && (
+                    <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  )}
+                </Button>
+
+                {isNotificationsOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-80 bg-background border border-border rounded-lg shadow-2xl z-50 overflow-hidden">
+                    <div className="p-3 border-b border-border bg-muted/5 font-semibold text-sm">
+                      Announcements
+                    </div>
+                    <div className="max-h-[300px] overflow-y-auto">
+                      {announcements.length === 0 ? (
+                        <div className="p-4 text-xs text-muted-foreground text-center">No announcements yet.</div>
+                      ) : (
+                        announcements.map((ann, idx) => (
+                          <div key={idx} className="p-4 border-b border-border/50 hover:bg-white/5 transition-colors">
+                            <div className="flex justify-between items-start mb-1">
+                              <h4 className="text-sm font-semibold">{ann.title}</h4>
+                              {ann.audience === 'MENTOR' && (
+                                <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-mono uppercase tracking-wider">Admin to Mentor</span>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground leading-relaxed">{ann.content}</p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
             <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mt-1">
               Track: {profile?.track_name || teams[0]?.track || 'Loading...'}
             </div>

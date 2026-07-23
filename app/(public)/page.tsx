@@ -11,7 +11,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FaqSearch } from '@/components/faq/FaqSearch';
+
+import { SmartCropImage } from '@/components/ui/smart-crop-image';
 import { fetchTrackStatistics, TrackStatistics } from '@/lib/data/teams';
 import {
   Accordion,
@@ -46,12 +47,11 @@ function ProfileModal({ member, onClose }: { member: Member; onClose: () => void
         {/* Portrait */}
         <div className="w-full md:w-60 aspect-[3/4] md:aspect-auto relative bg-muted/5 border-r border-border flex-shrink-0">
           {member.photo ? (
-            <Image
+            <SmartCropImage
               src={member.photo}
               alt={member.name}
-              fill
-              className="object-cover object-top"
-              sizes="(max-width: 768px) 100vw, 240px"
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 500px"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center text-[5rem] font-bold text-foreground/10 select-none">
@@ -220,8 +220,6 @@ export default function LandingPage() {
   // Leadership modal
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
-  // FAQ search
-  const [faqQuery, setFaqQuery] = useState('');
 
   // Dynamic track stats
   const [trackStats, setTrackStats] = useState<Record<string, TrackStatistics>>({});
@@ -303,6 +301,7 @@ export default function LandingPage() {
           </div>
         </Container>
       </section>
+
 
       {/* ─── LEADERBOARD PREVIEW ─── */}
       <section className="py-24 bg-muted/5 border-t border-border">
@@ -403,34 +402,66 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="relative border-l border-border/50 ml-4 md:ml-0 md:border-l-0 md:border-t md:flex md:flex-row pt-12 md:pt-0 mt-12 md:mt-24">
+          <div className="relative flex flex-col md:flex-row gap-8 md:gap-4 mt-16 md:mt-24 w-full">
+            {/* The continuous line background (Desktop) */}
+            <div className="hidden md:block absolute top-0 left-0 w-full h-0.5 bg-border/40 -translate-y-1/2" />
+            
+            {/* The progress line (Desktop) */}
+            <div className="hidden md:block absolute top-0 left-0 h-0.5 bg-gradient-to-r from-primary via-purple-500 to-indigo-500 -translate-y-1/2 shadow-[0_0_15px_rgba(var(--primary),0.6)]" style={{ width: '25%' }} />
+
+            {/* The continuous line background (Mobile) */}
+            <div className="md:hidden absolute top-0 left-[15px] h-full w-0.5 bg-border/40" />
+
+            {/* The progress line (Mobile) */}
+            <div className="md:hidden absolute top-0 left-[15px] w-0.5 bg-gradient-to-b from-primary via-purple-500 to-indigo-500 shadow-[0_0_15px_rgba(var(--primary),0.6)]" style={{ height: '25%' }} />
+
             {timeline.map((phase, index) => {
               const status = index === 0 ? 'completed' : index === 1 ? 'active' : 'upcoming';
               return (
-                <div key={phase.id} className="relative flex-1 group md:px-6 mb-12 md:mb-0 last:mb-0 pl-8 md:pl-6 border-l md:border-l-0 md:border-r border-transparent md:border-border/30 last:border-r-0 hover:bg-white/2 transition-colors duration-300 md:pt-12">
-                  <div className={`absolute left-0 md:left-6 md:top-0 md:-translate-y-1/2 w-3 h-3 -translate-x-[6.5px] md:translate-x-0 rounded-full border-2 transition-all duration-300
-                    ${status === 'active' ? 'bg-primary border-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]' :
-                      status === 'completed' ? 'bg-foreground border-foreground' : 'bg-background border-border'}`}
-                  />
-                  <div className="flex items-center gap-3 mb-6">
-                    <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">P0{index + 1}</span>
-                    {status === 'active' && (
-                      <span className="px-2 py-0.5 bg-primary/20 text-primary text-[9px] uppercase font-bold tracking-widest border border-primary/30 rounded">
-                        Active Phase
-                      </span>
-                    )}
-                    {status === 'completed' && (
-                      <span className="px-2 py-0.5 bg-foreground/10 text-foreground text-[9px] uppercase font-bold tracking-widest border border-foreground/20 rounded">
-                        Locked
-                      </span>
-                    )}
+                <div key={phase.id} className="relative flex-1 group pl-12 md:pl-0 md:pt-12 transition-all duration-500">
+                  {/* Dot */}
+                  <div className={`absolute left-0 md:left-1/2 md:top-0 top-1 md:-translate-y-1/2 w-8 h-8 md:w-5 md:h-5 md:-translate-x-1/2 rounded-full border-2 flex items-center justify-center transition-all duration-500 z-10
+                    ${status === 'active' ? 'bg-[#0a0a0a] border-primary shadow-[0_0_20px_rgba(var(--primary),0.8)] scale-125' :
+                      status === 'completed' ? 'bg-primary border-primary' : 'bg-[#0a0a0a] border-border/50 group-hover:border-border'}`}
+                  >
+                    {status === 'active' && <div className="w-2 h-2 rounded-full bg-primary animate-ping" />}
+                    {status === 'completed' && <Icons.check className="w-3 h-3 text-background font-bold" />}
                   </div>
-                  <div className={`transition-opacity duration-300 ${status === 'upcoming' ? 'opacity-40' : 'opacity-100'}`}>
-                    <h3 className="text-xl font-semibold tracking-tight mb-2 text-foreground group-hover:text-primary transition-colors">
-                      {phase.title}
-                    </h3>
-                    <div className="text-sm font-mono uppercase tracking-widest text-muted-foreground mb-4">{phase.date}</div>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{phase.status}</p>
+                  
+                  {/* Card Content */}
+                  <div className={`relative p-5 xl:p-6 rounded-2xl transition-all duration-500 overflow-hidden ${
+                    status === 'active' 
+                      ? 'bg-gradient-to-br from-primary/10 via-purple-500/5 to-transparent border border-primary/30 shadow-[0_4px_30px_rgba(var(--primary),0.15)] md:-translate-y-2' 
+                      : 'bg-transparent border border-transparent group-hover:border-border/50 group-hover:bg-white/[0.02]'
+                  }`}>
+                    {/* Inner glowing orb for active */}
+                    {status === 'active' && (
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-[40px] -mr-16 -mt-16 pointer-events-none" />
+                    )}
+                    
+                    <div className="flex flex-wrap items-center gap-2 xl:gap-3 mb-4">
+                      <span className={`font-mono text-[10px] xl:text-xs uppercase tracking-widest ${status === 'active' ? 'text-primary font-bold' : 'text-muted-foreground'}`}>
+                        P0{index + 1}
+                      </span>
+                      {status === 'active' && (
+                        <span className="px-2 py-0.5 bg-primary/20 text-primary text-[8px] xl:text-[9px] uppercase font-bold tracking-widest border border-primary/30 rounded-full">
+                          Active
+                        </span>
+                      )}
+                      {status === 'completed' && (
+                        <span className="px-2 py-0.5 bg-foreground/10 text-foreground text-[8px] xl:text-[9px] uppercase font-bold tracking-widest border border-foreground/20 rounded-full">
+                          Done
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className={`transition-opacity duration-300 ${status === 'upcoming' ? 'opacity-50 group-hover:opacity-100' : 'opacity-100'}`}>
+                      <h3 className={`text-lg xl:text-xl font-bold tracking-tight mb-2 ${status === 'active' ? 'text-foreground' : 'text-foreground/90'}`}>
+                        {phase.title}
+                      </h3>
+                      <div className="text-[9px] xl:text-[11px] font-mono uppercase tracking-widest text-primary/80 mb-3">{phase.date}</div>
+                      <p className="text-xs xl:text-sm text-muted-foreground leading-relaxed line-clamp-2 md:line-clamp-3 xl:line-clamp-none">{phase.status}</p>
+                    </div>
                   </div>
                 </div>
               );
@@ -504,139 +535,61 @@ export default function LandingPage() {
         </Container>
       </section>
 
-      {/* ─── FAQ — shared component with live search ─── */}
-      <section className="py-32 bg-muted/20 border-b border-border">
+
+      {/* ─── PARTNERS & SUPPORTERS ─── */}
+      <section className="py-24 bg-background border-t border-border">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
-            {/* Sidebar */}
-            <div className="lg:col-span-4 flex flex-col gap-8">
-              <div>
-                <h2 className="text-4xl font-semibold tracking-tighter mb-4">Operations & FAQ</h2>
-                <p className="text-muted-foreground">
-                  Strict guidelines and answers regarding the competition mechanics.
-                </p>
-              </div>
+          <div className="flex flex-col items-center justify-center mb-20">
+            <h2 className="text-sm font-semibold tracking-[0.2em] uppercase text-foreground mb-4 text-center">
+              PARTNERS & SUPPORTERS
+            </h2>
+          </div>
 
-              {/* Contact */}
-              <div className="border border-border bg-background p-8">
-                <h3 className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-4">Direct Contact</h3>
-                <a href={`mailto:${PUBLIC_CONTENT.contact.email}`} className="text-lg font-medium mb-1 hover:text-primary transition-colors flex items-center gap-2">
-                  <Icons.mail className="w-4 h-4" />
-                  {PUBLIC_CONTENT.contact.email}
-                </a>
-                <div className="text-muted-foreground text-sm mt-1">{PUBLIC_CONTENT.contact.phone}</div>
-              </div>
-
-              {/* Search input — connected to FaqSearch below */}
-              <div className="relative">
-                <Icons.search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="Search knowledge base..."
-                  value={faqQuery}
-                  onChange={(e) => setFaqQuery(e.target.value)}
-                  className="w-full bg-background border border-border px-12 py-4 text-sm focus:outline-none focus:border-primary transition-colors duration-150 text-foreground placeholder:text-muted-foreground"
-                />
-                {faqQuery && (
-                  <button
-                    onClick={() => setFaqQuery('')}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label="Clear search"
-                  >
-                    <Icons.close className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-
-              <Link
-                href="/faq"
-                className="text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+          <div className="flex flex-wrap justify-center items-center gap-x-20 gap-y-16 max-w-6xl mx-auto">
+            {sponsors.filter(s => !['AITR', 'CSIT', 'CY'].includes(s.shortName)).map((sponsor, idx) => (
+              <Link 
+                key={idx} 
+                href="/sponsors" 
+                className="group relative h-32 flex items-center justify-center transition-all duration-300 hover:scale-105"
               >
-                View All FAQs <Icons.arrowRight className="w-3 h-3" />
-              </Link>
-            </div>
-
-            {/* FAQ Accordion — same shared component used by /faq page */}
-            <div className="lg:col-span-8">
-              <FaqSearch
-                items={faqs}
-                externalQuery={faqQuery}
-              />
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* ─── SPONSORS: Marquee Strip ─── */}
-      <section className="py-24 bg-background border-b border-border overflow-hidden">
-        <Container>
-          <div className="flex justify-between items-end mb-12 border-b border-border pb-4">
-            <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Strategic Partners
-            </div>
-            <Link href="/sponsors" className="text-xs font-mono uppercase tracking-widest hover:text-primary transition-colors duration-150">
-              View All Partners →
-            </Link>
-          </div>
-        </Container>
-
-        <div className="relative w-full overflow-hidden flex items-center h-32 mt-12 before:absolute before:left-0 before:top-0 before:z-10 before:h-full before:w-32 before:bg-gradient-to-r before:from-background before:to-transparent after:absolute after:right-0 after:top-0 after:z-10 after:h-full after:w-32 after:bg-gradient-to-l after:from-background after:to-transparent">
-          <style dangerouslySetInnerHTML={{__html: `
-            @keyframes sponsorMarquee {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(-50%); }
-            }
-            .animate-sponsor-marquee {
-              animation: sponsorMarquee 40s linear infinite;
-              display: flex;
-              width: max-content;
-            }
-            .animate-sponsor-marquee:hover {
-              animation-play-state: paused;
-            }
-          `}} />
-          <div className="animate-sponsor-marquee gap-24 px-12">
-            {[...sponsors, ...sponsors].map((sponsor, idx) => (
-              <Link key={idx} href="/sponsors" className="group relative w-36 h-16 flex-shrink-0 opacity-50 hover:opacity-100 transition-all duration-250 hover:scale-105">
-                <Image
-                  src={sponsor.logo}
-                  alt={sponsor.name}
-                  fill
-                  className="object-contain"
-                />
+                <div className="w-64 h-28 relative opacity-80 group-hover:opacity-100 transition-opacity">
+                  <Image
+                    src={sponsor.logo}
+                    alt={sponsor.name}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
               </Link>
             ))}
           </div>
-        </div>
+        </Container>
       </section>
 
-      {/* ─── FOOTER ─── */}
-      <footer className="bg-foreground text-background py-20">
+      {/* ─── CALL TO ACTION (Light) ─── */}
+      <section className="bg-[#f2efe9] text-zinc-900 pt-20 pb-12 border-t border-border">
         <Container>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 justify-between items-end border-b border-background/20 pb-16 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 justify-between items-end pb-12 border-b border-zinc-900/10 mb-8">
             <div>
               <h2 className="text-5xl font-semibold tracking-tighter mb-4">{PUBLIC_CONTENT.hero.eventTitle}</h2>
-              <p className="text-background/60">{PUBLIC_CONTENT.hero.tagline}</p>
+              <p className="text-zinc-600 font-light">{PUBLIC_CONTENT.hero.tagline}</p>
             </div>
             <div className="md:text-right flex flex-col md:items-end">
-              <div className="text-background/50 font-mono text-xs uppercase tracking-widest mb-4">Operations</div>
-              <Button asChild className="bg-background text-foreground hover:bg-background/90 rounded-none px-8 py-6 h-auto text-sm transition-transform hover:scale-[0.98] duration-150 w-full sm:w-auto">
+              <div className="text-zinc-500 font-mono text-xs uppercase tracking-widest mb-4">Operations</div>
+              <Button asChild className="bg-black text-white hover:bg-black/90 rounded-none px-10 py-7 h-auto text-base transition-transform hover:scale-[0.98] duration-150 w-full sm:w-auto shadow-xl">
                 <Link href="/login">Platform Login</Link>
               </Button>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center text-xs font-mono text-background/40">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center text-xs font-mono text-zinc-500">
             <div>{PUBLIC_CONTENT.footer.copyright}</div>
-            <div className="flex flex-wrap gap-8 mt-4 md:mt-0">
-              {PUBLIC_CONTENT.footer.links.map((link, i) => (
-                <Link key={i} href={link.href} className="hover:text-background transition-colors duration-150">
-                  {link.label}
-                </Link>
-              ))}
+            <div className="flex flex-wrap gap-6 mt-4 md:mt-0">
+              <Link href="/rulebook" className="hover:text-zinc-900 transition-colors duration-150">Rulebook</Link>
+              <Link href="/contact" className="hover:text-zinc-900 transition-colors duration-150">Contact Operations</Link>
             </div>
           </div>
         </Container>
-      </footer>
+      </section>
 
       {/* ─── Leadership Profile Modal ─── */}
       <AnimatePresence>

@@ -47,6 +47,22 @@ export const AuthService = {
     return data;
   },
 
+  async signInWithEmailAndPassword(email: string, password: string): Promise<unknown> {
+    if (IS_MOCKED) {
+      await new Promise(r => setTimeout(r, 600));
+      setMockLoggedOut(false);
+      return { user: MOCK_USER };
+    }
+    const { createClient } = await import('@/lib/supabase/client');
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
+    return data;
+  },
+
   async signOut() {
     if (IS_MOCKED) {
       setMockLoggedOut(true);

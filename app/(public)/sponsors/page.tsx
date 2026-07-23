@@ -6,7 +6,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
 
-const TIER_1 = ["Powered By"];
+const TIER_1 = ["Powered By", "Organizing Departments"];
 const TIER_2 = ["Academic Partners", "Technology Partners"];
 const TIER_3 = ["Hiring Partners", "Community Partners"];
 const CATEGORY_ORDER = [...TIER_1, ...TIER_2, ...TIER_3];
@@ -52,8 +52,20 @@ const fadeUpItem: any = {
 
 export default function SponsorsPage() {
   return (
-    <div className="min-h-screen bg-[#050505] text-[#FAFAFA] font-sans selection:bg-white/10 selection:text-white pb-32 overflow-hidden">
-      <div className="pt-40 pb-32">
+    <div className="min-h-screen bg-[#050505] text-[#FAFAFA] font-sans selection:bg-white/10 selection:text-white pb-32 overflow-hidden relative">
+      
+      {/* ─── STRUCTURAL PAGE BACKGROUND ─── */}
+      <div className="fixed inset-0 pointer-events-none z-0 flex justify-center opacity-30">
+        <div className="w-full max-w-[1400px] h-full flex justify-between px-6 lg:px-12">
+          <div className="w-px h-full bg-white/[0.03]" />
+          <div className="w-px h-full bg-white/[0.03] hidden md:block" />
+          <div className="w-px h-full bg-white/[0.03] hidden lg:block" />
+          <div className="w-px h-full bg-white/[0.03] hidden md:block" />
+          <div className="w-px h-full bg-white/[0.03]" />
+        </div>
+      </div>
+
+      <div className="pt-40 pb-32 relative z-10">
         <Container>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -75,49 +87,69 @@ export default function SponsorsPage() {
         </Container>
       </div>
 
-      <div className="flex flex-col gap-32">
+      <div className="flex flex-col gap-24">
         {CATEGORY_ORDER.map((category) => {
           const categorySponsors = SPONSORS_CONFIG.filter((s) => s.category === category);
           if (categorySponsors.length === 0) return null;
 
-          const isTier1 = TIER_1.includes(category);
-          const isTier2 = TIER_2.includes(category);
-
           return (
-            <section key={category} className="w-full">
+            <section key={category} className="w-full relative z-10">
               <Container>
-                <div className="mb-12 border-b border-white/[0.04] pb-6">
-                  <h2 className="text-[14px] md:text-[16px] font-mono uppercase tracking-widest text-[#9A9A9A] flex items-center gap-4">
-                    {category}
-                    <span className="flex-1 h-px bg-white/[0.02]" />
-                  </h2>
-                </div>
+                <div className="border border-white/[0.06] bg-[#0A0A0A] p-8 md:p-16 relative overflow-hidden group/section">
+                  
+                  {/* Corner accents */}
+                  <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-white/30 transition-colors duration-500 group-hover/section:border-white/60 -translate-x-px -translate-y-px" />
+                  <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-white/30 transition-colors duration-500 group-hover/section:border-white/60 translate-x-px -translate-y-px" />
+                  <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-white/30 transition-colors duration-500 group-hover/section:border-white/60 -translate-x-px translate-y-px" />
+                  <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-white/30 transition-colors duration-500 group-hover/section:border-white/60 translate-x-px translate-y-px" />
+                  
+                  {/* Subtle Tech Grid inside the block */}
+                  <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
-                <motion.div
-                  variants={staggerContainer}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true, margin: "-100px" }}
-                  className={`group/sponsors ${
-                    isTier1
-                      ? "flex flex-col gap-6"
-                      : isTier2
-                      ? "grid grid-cols-1 md:grid-cols-2 gap-6"
-                      : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-                  }`}
-                >
+                  <div className="mb-16 border-b border-white/[0.06] pb-6 relative z-10">
+                    <h2 className="text-[14px] md:text-[16px] font-mono uppercase tracking-widest text-[#9A9A9A] flex items-center gap-4">
+                      <span className="w-1.5 h-1.5 bg-white/20" />
+                      {category}
+                      <span className="flex-1 h-px bg-white/[0.02]" />
+                    </h2>
+                  </div>
+
+                  <motion.div
+                    variants={staggerContainer}
+                    initial="hidden"
+                    whileInView="show"
+                    className="relative z-10 flex flex-wrap justify-center gap-x-20 gap-y-16"
+                  >
                   {categorySponsors.map((sponsor) => (
                     <motion.div key={sponsor.name} variants={fadeUpItem} className="h-full">
-                      {isTier1 ? (
-                        <Tier1EditorialSponsor sponsor={sponsor} />
-                      ) : isTier2 ? (
-                        <Tier2StructuredSponsor sponsor={sponsor} />
-                      ) : (
-                        <Tier3WallSponsor sponsor={sponsor} />
-                      )}
+                      <a 
+                        href={sponsor.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group relative flex flex-col items-center justify-center p-4 min-h-[160px] transition-all duration-300 hover:scale-105"
+                      >
+                        <div className="w-64 h-28 relative opacity-80 group-hover:opacity-100 transition-opacity mb-4">
+                          <img
+                            src={sponsor.logo}
+                            alt={`${sponsor.name} logo`}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <div className="text-center mt-2">
+                          <h3 className="text-sm font-medium tracking-tight text-white mb-1">
+                            {sponsor.name}
+                          </h3>
+                          {sponsor.description && (
+                            <p className="text-xs text-[#9A9A9A] font-light leading-relaxed max-w-[240px]">
+                              {sponsor.description}
+                            </p>
+                          )}
+                        </div>
+                      </a>
                     </motion.div>
                   ))}
-                </motion.div>
+                  </motion.div>
+                </div>
               </Container>
             </section>
           );
@@ -131,134 +163,5 @@ export default function SponsorsPage() {
         </div>
       </Container>
     </div>
-  );
-}
-
-// ─── UTILS & WRAPPERS ──────────────────────────────────────────────────────────
-
-function SponsorWrapper({ children, className, href }: { children: ReactNode; className: string; href: string }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`group relative block w-full overflow-hidden transition-all duration-[350ms] ease-out hover:-translate-y-[2px] ${className}`}
-    >
-      <div className="relative z-10 w-full h-full flex flex-col justify-between">
-        {children}
-      </div>
-    </a>
-  );
-}
-
-// Removed getLogoClasses in favor of standard img tags
-
-// ─── TIER 1: POWERED BY (Side-by-Side Composition) ─────────────────────────
-
-function Tier1EditorialSponsor({ sponsor }: { sponsor: Sponsor }) {
-  const opticalSize = OPTICAL_SIZING[sponsor.shortName || ""] || "h-[80px] max-w-[300px] w-auto";
-
-  return (
-    <SponsorWrapper
-      href={sponsor.website}
-      className="bg-[#050505] border border-white/[0.08] hover:border-white/[0.2] hover:bg-[#0A0A0A] shadow-2xl rounded-[2rem] p-2 md:p-3"
-    >
-      <div className="flex flex-col lg:flex-row gap-6 h-full">
-        {/* Left: Hugging White Canvas */}
-        <div className="self-start bg-white rounded-[1.5rem] py-6 px-8 flex items-center justify-center mt-4 ml-4">
-          <img
-            src={sponsor.logo}
-            alt={`${sponsor.name} logo`}
-            className={`${opticalSize} object-contain transition-all duration-[350ms] scale-100 group-hover:scale-[1.02]`}
-          />
-        </div>
-
-        {/* Right: Dark Text Area */}
-        <div className="flex-1 flex flex-col justify-center text-left py-8 px-6 lg:px-12">
-          <h3 className="text-[28px] md:text-[36px] font-medium tracking-tight text-white leading-tight mb-4">
-            {sponsor.name}
-          </h3>
-          {sponsor.description && (
-            <p className="text-[16px] md:text-[18px] text-[#9A9A9A] font-light leading-relaxed max-w-[400px]">
-              {sponsor.description}
-            </p>
-          )}
-          <span className="text-[12px] font-mono uppercase tracking-widest text-white flex items-center gap-3 mt-8">
-            Explore Partnership
-            <span className="block w-6 h-px bg-white/20 group-hover:bg-white transition-colors duration-[350ms]" />
-          </span>
-        </div>
-      </div>
-    </SponsorWrapper>
-  );
-}
-
-// ─── TIER 2: ACADEMIC & TECH (Structured Editorial Card) ───────────────────
-
-function Tier2StructuredSponsor({ sponsor }: { sponsor: Sponsor }) {
-  const opticalSize = OPTICAL_SIZING[sponsor.shortName || ""] || "h-[50px] max-w-[200px] w-auto";
-
-  return (
-    <SponsorWrapper
-      href={sponsor.website}
-      className="h-full bg-[#050505] border border-white/[0.08] hover:border-white/[0.2] hover:bg-[#0A0A0A] shadow-xl rounded-2xl p-2 md:p-3 flex flex-col"
-    >
-      {/* Top: Hugging White Canvas */}
-      <div className="self-start bg-white rounded-xl py-4 px-6 md:px-8 flex justify-center items-center mb-5">
-        <img
-          src={sponsor.logo}
-          alt={`${sponsor.name} logo`}
-          className={`${opticalSize} object-contain transition-all duration-[350ms] scale-100 group-hover:scale-[1.02]`}
-        />
-      </div>
-
-      {/* Middle/Bottom: Typography */}
-      <div className="flex flex-col w-full flex-1 px-6 md:px-8 pb-6 md:pb-8 text-left">
-        <h3 className="text-[20px] font-semibold tracking-tight text-white mb-2">
-          {sponsor.name}
-        </h3>
-        {sponsor.description && (
-          <p className="text-[14px] text-[#9A9A9A] font-normal leading-relaxed mb-6 flex-1">
-            {sponsor.description}
-          </p>
-        )}
-        <span className="text-[11px] font-bold uppercase tracking-widest text-white flex items-center gap-2 mt-auto">
-          Explore
-          <span className="block w-4 h-px bg-white/20 group-hover:bg-white transition-colors duration-[350ms]" />
-        </span>
-      </div>
-    </SponsorWrapper>
-  );
-}
-
-// ─── TIER 3: COMMUNITY & HIRING (Minimal Logo Wall) ────────────────────────
-
-function Tier3WallSponsor({ sponsor }: { sponsor: Sponsor }) {
-  const opticalSize = OPTICAL_SIZING[sponsor.shortName || ""] || "h-[40px] max-w-[150px] w-auto";
-
-  return (
-    <SponsorWrapper
-      href={sponsor.website}
-      className="h-full bg-[#050505] border border-white/[0.04] hover:border-white/[0.15] hover:bg-[#0A0A0A] rounded-xl p-2 flex flex-col min-h-[220px]"
-    >
-      <div className="self-start bg-white rounded-lg py-3 px-4 flex justify-center items-center mb-4">
-        <img
-          src={sponsor.logo}
-          alt={`${sponsor.name} logo`}
-          className={`${opticalSize} object-contain transition-all duration-[350ms] scale-100 group-hover:scale-[1.02]`}
-        />
-      </div>
-      
-      <div className="flex flex-col w-full px-4 pb-4 text-left">
-        <h3 className="text-[16px] font-semibold tracking-tight text-white mb-1">
-          {sponsor.name}
-        </h3>
-        {sponsor.description && (
-          <p className="text-[13px] text-[#9A9A9A] font-normal leading-relaxed">
-            {sponsor.description}
-          </p>
-        )}
-      </div>
-    </SponsorWrapper>
   );
 }

@@ -6,6 +6,15 @@ import { createClient as supabase } from '@/lib/supabase/client';
 import { Icons } from '@/components/constants/icons';
 import { Button } from '@/components/primitives/button';
 import IKIGAI2026_CONFIG from '@/config/event.config';
+import { useProfile } from '@/features/authentication/hooks/useProfile';
+
+type Activity = {
+  id: string;
+  teamName: string;
+  mentorName: string;
+  score: number;
+  time: string;
+};
 
 type LeaderboardTeam = {
   id: string;
@@ -39,6 +48,11 @@ export default function LeaderboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [mode, setMode] = useState<'hidden' | 'live' | 'final'>('live');
   const [selectedTeam, setSelectedTeam] = useState<LeaderboardTeam | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const { profile } = useProfile();
+  
+  // Calculate if the user has a team on the board
+  const userTeam = profile?.team_id ? teams.find(t => t.id === profile.team_id) : null;
 
   useEffect(() => {
     fetchLeaderboard();
@@ -78,13 +92,13 @@ export default function LeaderboardPage() {
       if (!res.ok) throw new Error('Failed to fetch data');
       const { teams: teamsData, submissions: submissionsData, evaluations: evalsData }: { teams: any[], submissions: any[], evaluations: any[] } = await res.json();
 
-    const teamScores = new Map<string, { total: number; count: number; latest_feedback: string | null; last_updated: Date | null }>();
+    const teamScores = new Map<string, { total: number; count: number; latest_feedback: string | null; last_updated: Date | null; evals: { score: number, date: number }[] }>();
     evalsData.forEach((ev) => {
       if (ev.total_score === null) return;
       const sub = submissionsData.find((s) => s.id === ev.submission_id);
       if (!sub) return;
       
-      const current = teamScores.get(sub.team_id) || { total: 0, count: 0, latest_feedback: null, last_updated: null };
+      const current = teamScores.get(sub.team_id) || { total: 0, count: 0, latest_feedback: null, last_updated: null, evals: [] };
       
       let newFeedback = current.latest_feedback;
       let newDate = current.last_updated;
@@ -95,11 +109,15 @@ export default function LeaderboardPage() {
         newDate = evDate;
       }
 
+      const evals = current.evals;
+      evals.push({ score: ev.total_score, date: evDate ? evDate.getTime() : 0 });
+
       teamScores.set(sub.team_id, { 
         total: current.total + ev.total_score, 
         count: current.count + 1,
         latest_feedback: newFeedback,
-        last_updated: newDate
+        last_updated: newDate,
+        evals
       });
     });
 
@@ -113,6 +131,20 @@ export default function LeaderboardPage() {
       const trackId = trackData?.id || 'unknown';
       const mentorName = TRACK_MENTORS[trackId] || 'Expert Panel';
 
+      let score_change = 0;
+      if (scoreData.count === 1) {
+        score_change = 1; // First score given = trending up
+      } else if (scoreData.count > 1) {
+        const sortedEvals = [...scoreData.evals].sort((a, b) => a.date - b.date);
+        const latest = sortedEvals[sortedEvals.length - 1].score;
+        const prevEvals = sortedEvals.slice(0, -1);
+        const prevAvg = prevEvals.reduce((sum, e) => sum + e.score, 0) / prevEvals.length;
+        
+        if (latest > prevAvg) score_change = 1;
+        else if (latest < prevAvg) score_change = -1;
+        else score_change = 0;
+      }
+
       return {
         id: t.id,
         rank: 0,
@@ -122,7 +154,7 @@ export default function LeaderboardPage() {
         avg_total: avg,
         evaluation_count: scoreData.count,
         latest_feedback: scoreData.latest_feedback,
-        score_change: 0,
+        score_change: score_change,
         github: t.repository_url,
         presentation: sub?.presentation_url,
         members: [],
@@ -136,8 +168,31 @@ export default function LeaderboardPage() {
     const configTracks = IKIGAI2026_CONFIG.tracks.map((t: any) => t.name || t.title);
     const uniqueTracks = ['All Tracks', ...configTracks];
     
+    leaderboard.forEach((t, i) => (t.rank = i + 1));
+
+    const recentEvals = evalsData
+      .filter((ev: any) => ev.total_score !== null && ev.updated_at)
+      .sort((a: any, b: any) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+      .slice(0, 6)
+      .map((ev: any) => {
+        const sub = submissionsData.find((s: any) => s.id === ev.submission_id);
+        const team = teamsData.find((t: any) => t.id === sub?.team_id);
+        const trackData = Array.isArray(team?.tracks) ? team?.tracks[0] : (team?.tracks as any);
+        const trackId = trackData?.id || 'unknown';
+        const mentorName = TRACK_MENTORS[trackId] || 'Expert Panel';
+        
+        return {
+          id: `${sub?.team_id}-${ev.updated_at}-${Math.random()}`,
+          teamName: team?.name || 'Unknown Team',
+          score: ev.total_score,
+          time: new Date(ev.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          mentorName
+        };
+      });
+
     setTracks(uniqueTracks);
     setTeams(leaderboard);
+    setActivities(recentEvals);
     setIsLoading(false);
     } catch (error) {
       console.error(error);
@@ -148,8 +203,11 @@ export default function LeaderboardPage() {
   const filteredTeams = useMemo(() => {
     let result = activeTrack === 'All Tracks' ? teams : teams.filter((t) => t.track_name === activeTrack);
     if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(t => t.team_name.toLowerCase().includes(q) || t.college_name.toLowerCase().includes(q));
+      const tokens = searchQuery.toLowerCase().split(/\s+/).filter(Boolean);
+      result = result.filter(t => {
+        const text = `${t.team_name} ${t.track_name} ${t.mentor_name}`.toLowerCase();
+        return tokens.every(token => text.includes(token));
+      });
     }
     return result;
   }, [teams, activeTrack, searchQuery]);
@@ -306,19 +364,57 @@ export default function LeaderboardPage() {
             {/* Pinned Current Team */}
             <div>
               <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4 border-b border-border/50 pb-2">Your Telemetry</h3>
-              <div className="border border-border/50 p-6 bg-muted/10 flex flex-col items-center justify-center text-center min-h-[150px]">
-                <Icons.user className="w-6 h-6 text-muted-foreground mb-4" />
-                <div className="text-sm font-medium tracking-tight mb-2">Unidentified User</div>
-                <div className="text-xs text-muted-foreground">Authenticate to view your team's live standing.</div>
+              <div className="border border-border/50 p-6 bg-muted/10 rounded-xl flex flex-col items-center justify-center text-center min-h-[150px]">
+                {profile ? (
+                  userTeam ? (
+                    <>
+                      <div className="text-[10px] font-mono uppercase tracking-widest text-cyan-500 mb-2">Rank {String(userTeam.rank).padStart(2, '0')}</div>
+                      <div className="text-lg font-semibold tracking-tight mb-1">{userTeam.team_name}</div>
+                      <div className="text-3xl font-mono font-bold text-foreground mb-1">{userTeam.avg_total.toFixed(1)}</div>
+                      <div className="text-[10px] font-mono text-muted-foreground">Average Score</div>
+                    </>
+                  ) : (
+                    <>
+                      <Icons.user className="w-6 h-6 text-muted-foreground mb-4" />
+                      <div className="text-sm font-medium tracking-tight mb-2">{profile.full_name || 'Authenticated User'}</div>
+                      <div className="text-xs text-muted-foreground">You are not currently assigned to an active team.</div>
+                    </>
+                  )
+                ) : (
+                  <>
+                    <Icons.user className="w-6 h-6 text-muted-foreground mb-4" />
+                    <div className="text-sm font-medium tracking-tight mb-2">Unidentified User</div>
+                    <div className="text-xs text-muted-foreground">Authenticate to view your team's live standing.</div>
+                  </>
+                )}
               </div>
             </div>
 
             {/* Activity Feed */}
             <div>
               <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4 border-b border-border/50 pb-2">Live Activity Stream</h3>
-              <div className="flex flex-col border border-border/50 bg-muted/5 items-center justify-center text-center min-h-[200px] p-6">
-                 <Icons.activity className="w-6 h-6 text-muted-foreground mb-4 opacity-50" />
-                 <div className="text-sm text-muted-foreground font-mono">Stream empty. Awaiting judge evaluations...</div>
+              <div className="flex flex-col border border-border/50 bg-muted/5 min-h-[200px] rounded-xl overflow-hidden">
+                 {activities.length > 0 ? (
+                   <div className="flex flex-col divide-y divide-border/50">
+                     {activities.map(act => (
+                       <div key={act.id} className="p-4 bg-background/50 flex flex-col gap-1">
+                         <div className="flex items-center justify-between">
+                           <span className="text-[10px] font-mono text-cyan-500 uppercase tracking-widest">{act.mentorName} scored</span>
+                           <span className="text-[10px] text-muted-foreground font-mono">{act.time}</span>
+                         </div>
+                         <div className="flex items-center justify-between mt-1">
+                           <span className="text-sm font-semibold truncate pr-4">{act.teamName}</span>
+                           <span className="text-sm font-mono font-bold bg-muted/20 px-2 py-0.5 rounded text-cyan-500">+{act.score}</span>
+                         </div>
+                       </div>
+                     ))}
+                   </div>
+                 ) : (
+                   <div className="p-6 flex flex-col items-center justify-center text-center h-full">
+                     <Icons.activity className="w-6 h-6 text-muted-foreground mb-4 opacity-50" />
+                     <div className="text-sm text-muted-foreground font-mono">Stream empty. Awaiting judge evaluations...</div>
+                   </div>
+                 )}
               </div>
             </div>
 

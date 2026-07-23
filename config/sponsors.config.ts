@@ -12,7 +12,7 @@ export const SPONSORS_CONFIG = [
     shortName: "CSIT",
     logo: "/images/sponsors/csit.png",
     website: "https://aitr.ac.in/computer-science-and-information-technology-csit/",
-    category: "Academic Partners",
+    category: "Organizing Departments",
     description: "Department of Computer Science and Information Technology."
   },
   {
@@ -20,7 +20,7 @@ export const SPONSORS_CONFIG = [
     shortName: "CY",
     logo: "/images/sponsors/cy-logo.png",
     website: "https://acropolis.in",
-    category: "Academic Partners",
+    category: "Organizing Departments",
     description: "Department of Computer Science and Engineering (Cyber Security)."
   },
   {

@@ -107,13 +107,11 @@ export const Navbar = () => {
         <div className="flex items-center gap-4">
 
           
+          <NotificationBell />
           {isAuthenticated ? (
-            <>
-              <NotificationBell />
-              <Button asChild variant="outline" size="sm" className="h-8 px-4 text-[10px] font-mono uppercase tracking-widest border-border transition-transform hover:scale-[0.98]">
-                <Link href={isWorkspace ? '/' : '/workspace'}>{isWorkspace ? 'Exit OS' : 'Dashboard'}</Link>
-              </Button>
-            </>
+            <Button asChild variant="outline" size="sm" className="h-8 px-4 text-[10px] font-mono uppercase tracking-widest border-border transition-transform hover:scale-[0.98]">
+              <Link href={isWorkspace ? '/' : '/workspace'}>{isWorkspace ? 'Exit OS' : 'Dashboard'}</Link>
+            </Button>
           ) : (
             <Button asChild variant="default" size="sm" className="h-8 px-5 text-[10px] font-mono uppercase tracking-widest transition-transform hover:scale-[0.98] rounded-none">
               <Link href="/login">Login</Link>

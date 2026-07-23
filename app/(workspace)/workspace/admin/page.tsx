@@ -12,6 +12,7 @@ export default function AdminPage() {
   const { data: stats, loading, refresh } = useAdminDashboard();
   const { data: settings } = useAdminSettings();
   const [announcementText, setAnnouncementText] = useState('');
+  const [audience, setAudience] = useState<'ALL' | 'MENTOR'>('ALL');
   const [isBroadcasting, setIsBroadcasting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
@@ -37,7 +38,7 @@ export default function AdminPage() {
       content: announcementText.trim(),
       is_published: true,
       priority: 'HIGH',
-      audience: 'ALL'
+      audience
     });
 
     setIsBroadcasting(false);
@@ -81,43 +82,6 @@ export default function AdminPage() {
         </div>
       </header>
 
-      {/* CORE TELEMETRY */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-px border border-border bg-border">
-        
-        <TelemetryWidget 
-          title="Submission Rate" 
-          value={`${healthyTeamsPercentage}%`} 
-          subtext="Of registered teams have submitted projects"
-          status="good"
-          icon={<Icons.activity className="w-5 h-5 text-primary" />}
-        />
-        
-        <TelemetryWidget 
-          title="Review Backlog" 
-          value={pendingReviews.toString()} 
-          subtext="Submissions waiting for mentor evaluation"
-          status={pendingReviews > 0 ? 'warning' : 'good'}
-          icon={<Icons.fileText className="w-5 h-5 text-muted-foreground" />}
-        />
-
-        <TelemetryWidget 
-          title="Judge Progress" 
-          value={`${judgeProgress}%`} 
-          subtext="Evaluations completed across active tracks"
-          status="good"
-          icon={<Icons.check className="w-5 h-5 text-primary" />}
-        />
-
-        <TelemetryWidget 
-          title="Active Tracks" 
-          value={`${stats.totalTracks}`} 
-          subtext="Domains receiving live submissions"
-          status="good"
-          icon={<Icons.cpu className="w-5 h-5 text-muted-foreground" />}
-        />
-
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* MAIN PANEL */}
@@ -154,7 +118,17 @@ export default function AdminPage() {
                 onChange={(e) => setAnnouncementText(e.target.value)}
               />
               <div className="border-t border-border p-4 bg-muted/5 flex justify-between items-center">
-                <span className="text-[10px] font-mono text-muted-foreground uppercase">Rich text not supported</span>
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] font-mono text-muted-foreground uppercase">Audience:</span>
+                  <select 
+                    value={audience} 
+                    onChange={(e) => setAudience(e.target.value as 'ALL' | 'MENTOR')}
+                    className="bg-background border border-border text-xs px-2 py-1 outline-none text-foreground"
+                  >
+                    <option value="ALL">Public (All Users)</option>
+                    <option value="MENTOR">Mentors Only</option>
+                  </select>
+                </div>
                 <Button 
                   size="sm" 
                   disabled={!announcementText.trim() || isBroadcasting}

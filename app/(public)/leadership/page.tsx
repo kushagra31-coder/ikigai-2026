@@ -6,84 +6,13 @@ import {
   type LeadershipMember,
 } from "@/config/leadership.config";
 import Image from "next/image";
-import { Users, Building2, GraduationCap, Check, X } from "lucide-react";
+import { Users, Building2, GraduationCap, Check, X, ArrowUpRight } from "lucide-react";
 import { Icons } from "@/components/constants/icons";
 import { useState, useEffect } from "react";
 import smartcrop from "smartcrop";
 import { AnimatePresence, motion } from "framer-motion";
+import { SmartCropImage } from "@/components/ui/smart-crop-image";
 
-const focalCache = new Map<string, { x: string; y: string; scale: number }>();
-
-function SmartCropImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [cropStyle, setCropStyle] = useState<{ objectPosition: string; transform: string } | null>(null);
-
-  useEffect(() => {
-    if (focalCache.has(src)) {
-      const cached = focalCache.get(src)!;
-      setCropStyle({
-        objectPosition: `${cached.x} ${cached.y}`,
-        transform: `scale(${cached.scale})`,
-      });
-      setIsLoaded(true);
-    }
-  }, [src]);
-
-  const handleLoad = async (e: React.SyntheticEvent<HTMLImageElement>) => {
-    if (focalCache.has(src)) {
-      setIsLoaded(true);
-      return;
-    }
-    const img = e.target as HTMLImageElement;
-    const nw = img.naturalWidth;
-    const nh = img.naturalHeight;
-    if (nw < 50 || nh < 50) {
-      setIsLoaded(true);
-      return;
-    }
-    try {
-      const result = await smartcrop.crop(img, { width: 400, height: 400 });
-      const crop = result.topCrop;
-      const cx = crop.x + crop.width / 2;
-      let cy = crop.y + crop.height / 2;
-      // Preserve forehead to prevent top-clipping on small circular avatars
-      cy = Math.max(0, cy - crop.height * 0.20); 
-      const px = (cx / nw) * 100;
-      const py = (cy / nh) * 100;
-      const styleData = { x: `${px.toFixed(1)}%`, y: `${py.toFixed(1)}%`, scale: 1.05 };
-      focalCache.set(src, styleData);
-      setCropStyle({
-        objectPosition: `${styleData.x} ${styleData.y}`,
-        transform: `scale(${styleData.scale})`,
-      });
-      setIsLoaded(true);
-    } catch (err) {
-      setIsLoaded(true);
-    }
-  };
-
-  return (
-    <Image
-      src={src}
-      alt={alt}
-      fill
-      sizes="(max-width: 768px) 100vw, 50vw"
-      style={
-        cropStyle
-          ? {
-              objectFit: "cover",
-              objectPosition: cropStyle.objectPosition,
-              transform: cropStyle.transform,
-            }
-          : { objectFit: "cover", objectPosition: "top" }
-      }
-      className={`transition-opacity duration-500 ${className || ""} ${
-        isLoaded ? "opacity-100" : "opacity-0"
-      }`}
-      onLoad={handleLoad}
-    />
-  );
-}
 
 export default function LeadershipPage() {
   const convenors = LEADERSHIP_CONFIG.filter((m) => m.category === "Convenors");
@@ -212,7 +141,7 @@ export default function LeadershipPage() {
             }
 
             return (
-              <section className="flex flex-col gap-12">
+              <section className="flex flex-col gap-16 mt-8">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end border-b border-border/50 pb-4 gap-4">
                   <h3 className="text-xl font-medium tracking-wide uppercase text-muted-foreground border-l-4 border-cyan-500 pl-4">
                     STUDENT EXECUTIVE COMMITTEE
@@ -222,16 +151,18 @@ export default function LeadershipPage() {
                   </div>
                 </div>
                 
-                {groupedMembers.map((group, groupIdx) => (
-                  <div key={groupIdx} className="flex flex-col gap-8 pb-4">
-                    <h4 className="text-sm font-bold uppercase tracking-widest text-foreground/70">{group.title}</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-8 gap-y-12">
-                      {group.members.map((member, idx) => (
-                        <StudentCard key={idx} member={member} />
-                      ))}
+                <div className="flex flex-col">
+                  {groupedMembers.map((group, groupIdx) => (
+                    <div key={groupIdx} className={`flex flex-col gap-10 pb-16 ${groupIdx > 0 ? 'border-t border-border/50 pt-16' : ''}`}>
+                      <h4 className="text-2xl font-light text-foreground">{group.title}</h4>
+                      <div className="flex flex-wrap gap-x-16 gap-y-12">
+                        {group.members.map((member, idx) => (
+                          <StudentCard key={idx} member={member} />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </section>
             );
           })()}
@@ -483,8 +414,8 @@ function StudentCard({ member }: { member: LeadershipMember }) {
   const initials = member.name.substring(0, 2).toUpperCase();
 
   return (
-    <div className="flex items-center gap-5 group relative">
-      <div className="w-16 h-16 rounded-full overflow-hidden relative shrink-0 bg-muted/30 border border-border/50 group-hover:border-foreground/30 transition-colors">
+    <div className="flex flex-col gap-4 group relative w-[180px]">
+      <div className="w-20 h-20 rounded-full overflow-hidden relative shrink-0 bg-muted/30">
         {member.photo ? (
           <SmartCropImage
             src={member.photo}
@@ -500,10 +431,13 @@ function StudentCard({ member }: { member: LeadershipMember }) {
       </div>
 
       <div className="flex flex-col">
-        <h4 className="font-semibold text-[15px] leading-snug text-foreground group-hover:text-cyan-500 transition-colors line-clamp-1">
-          {member.name}
-        </h4>
-        <p className="text-xs text-muted-foreground mt-1 line-clamp-1 font-medium">
+        <div className="flex items-center gap-2 mb-1">
+          <h4 className="font-light text-[17px] tracking-tight text-foreground group-hover:opacity-80 transition-opacity">
+            {member.name}
+          </h4>
+          <ArrowUpRight strokeWidth={1} className="w-5 h-5 text-foreground opacity-60 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+        </div>
+        <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-mono leading-relaxed">
           {member.designation}
         </p>
       </div>

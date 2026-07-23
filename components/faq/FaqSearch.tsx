@@ -51,20 +51,28 @@ function escapeRegex(str: string): string {
  */
 function highlightText(text: string, query: string): React.ReactNode {
   if (!query.trim()) return text;
-  const escaped = escapeRegex(query.trim());
-  const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
+  
+  const tokens = query.trim().split(/\s+/).filter(t => t.length > 1);
+  if (tokens.length === 0) return text;
+
+  const escapedTokens = tokens.map(escapeRegex);
+  const regex = new RegExp(`(${escapedTokens.join('|')})`, 'gi');
+  
+  const parts = text.split(regex);
   if (parts.length === 1) return text;
+
   return (
     <>
-      {parts.map((part, i) =>
-        part.toLowerCase() === query.toLowerCase().trim() ? (
+      {parts.map((part, i) => {
+        const isMatch = tokens.some(t => t.toLowerCase() === part.toLowerCase());
+        return isMatch ? (
           <mark key={i} className="bg-primary/25 text-primary rounded-sm px-0.5 not-italic font-medium">
             {part}
           </mark>
         ) : (
           part
-        )
-      )}
+        );
+      })}
     </>
   );
 }
@@ -75,14 +83,13 @@ export function FaqSearch({ items, showSearch = false, externalQuery, className 
 
   const filteredItems = useMemo(() => {
     if (!query.trim()) return items.map((f, i) => ({ ...f, originalIndex: i }));
-    const q = query.trim().toLowerCase();
+    const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
     return items
       .map((f, i) => ({ ...f, originalIndex: i }))
-      .filter(
-        (item) =>
-          item.question.toLowerCase().includes(q) ||
-          item.answer.toLowerCase().includes(q)
-      );
+      .filter((item) => {
+        const text = `${item.question} ${item.answer}`.toLowerCase();
+        return tokens.every(token => text.includes(token));
+      });
   }, [items, query]);
 
   // Auto-expand all matching items when searching
